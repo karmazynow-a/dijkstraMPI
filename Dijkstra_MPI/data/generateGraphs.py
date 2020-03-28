@@ -41,6 +41,7 @@ def main():
 def saveToFile(matrix):
 	fileName = args.file[0]
 	with open(fileName, 'w') as file:
+		file.write("{0}\n".format(len(matrix)))
 		# cut the matrix formatting
 		matFormat = ' {0}\n'.format(matrix).replace('[', '').replace(']', '')
 		file.write(matFormat)

@@ -1,12 +1,10 @@
 #pragma once
 
-constexpr int TEST_MATRIX_SIDE = 8;
-
 class AdjacencyMatrix final {
 
 public:
-
-	double matrix[TEST_MATRIX_SIDE][TEST_MATRIX_SIDE] = {
+/*
+	double test_matrix[TEST_MATRIX_SIDE][TEST_MATRIX_SIDE] = {
 		//{0, 0, 9, 0, 7, 0, 0, 0},
 		//{0, 0, 0, 0, 0, 0, 2, 0},
 		//{9, 0, 0, 0, 0, 9, 0, 0},
@@ -25,6 +23,19 @@ public:
 		{ 0, 0, 0, 0, 0, 0, 0, 0 },
 		{ 0, 0, 0, 0, 1, 7, 0, 0 }
 	};
-	int side = TEST_MATRIX_SIDE;
+*/
+	AdjacencyMatrix ();
+	AdjacencyMatrix ( const std::string filePath );
+	~AdjacencyMatrix ();
+
+	double getMatrixValue (const int i, const int j) const;
+	size_t getSideSize () const;
+	void printMatrix () const;
+
+private:
+	bool readDataFromFile( const std::string filePath );
+
+	double* m_matrix;
+	size_t m_sideSize;
 
 };

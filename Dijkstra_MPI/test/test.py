@@ -9,15 +9,17 @@ parser = argparse.ArgumentParser(description =
 	'Djikstra algorithm')
 parser.add_argument('inputFile', metavar='FILE', type=str, nargs=1, 
 	help='input file with adjacency matrix')
+parser.add_argument('startVertex', metavar='VERTEX', type=int, nargs=1, 
+	help='vertex to start algorithm')
 parser.add_argument('-o', '--output', metavar='FILE', type=str, nargs=1, 
-	default=['output.dat'], help='output file with path in dot format')
+	default=['output.dat'], help='output file with path')
 
 args = parser.parse_args()
 
 
 def main():
 	V, E, w = readData(args.inputFile[0])
-	weights, paths = djikstra(V, E, w, 2)
+	weights, paths = djikstra(V, E, w, args.startVertex[0])
 	saveToFile(weights, paths, args.output[0])
 
 
@@ -80,6 +82,7 @@ def saveToFile(weights, paths, fileName):
 def readData(fileName):
 	mat = [] #adjacency matrix
 	with open(fileName, 'r') as file:
+		file.readline() # skip first line with numbers of v
 		for line in file.readlines():
 			mat.append( [ float(i) for i in line.strip('\n').split(' ') if i ] )
 
@@ -91,8 +94,7 @@ def readData(fileName):
 			if mat[i][j] > 0:
 				E.append(set([i, j]))
 				w.append(mat[i][j])
-	print(E)	
-	print(w)
+
 	return V, E, w
 
 

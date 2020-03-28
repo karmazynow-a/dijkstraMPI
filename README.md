@@ -14,12 +14,13 @@ and vertices.
 
 ## Test the algorithm with sequential implementation
 
-    test.py [-h] [-o FILE] FILE
+    test.py [-h] [-o FILE] FILE VERTEX
 
     positional arguments:
     FILE                  input file with adjacency matrix
+    VERTEX                vertex to start algorithm
 
     optional arguments:
     -h, --help            show this help message and exit
     -o FILE, --output FILE
-                            output file with path in dot format
+                            output file with path

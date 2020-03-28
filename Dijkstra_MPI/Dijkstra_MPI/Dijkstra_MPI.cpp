@@ -14,9 +14,9 @@
 
 
 std::vector<int> divideGraphMatrixIntoChunks(const AdjacencyMatrix& graph, int numberOfProcesses) {
-	int averageNumberOfColumnsPerProcess = graph.side / numberOfProcesses;
+	int averageNumberOfColumnsPerProcess = graph.getSideSize() / numberOfProcesses;
 	std::vector<int> numbersOfColumnsForEachProcess(numberOfProcesses, averageNumberOfColumnsPerProcess);
-	int numberOfColumnsLeft = graph.side - averageNumberOfColumnsPerProcess * numberOfProcesses;
+	int numberOfColumnsLeft = graph.getSideSize() - averageNumberOfColumnsPerProcess * numberOfProcesses;
 	for (int i = 0; i < numberOfColumnsLeft; ++i) {
 		++numbersOfColumnsForEachProcess.at(i % numbersOfColumnsForEachProcess.size());
 	}
@@ -100,23 +100,25 @@ int main(int argc, char* argv[])
 
 	int matrixSide = -1;
 
-
 	std::vector<double> graphData;
 	if (processRank == 0) {
 		std::cout << "Please enter source vertex index: ";
 		std::cin >> sourceVertexIndex;
 
-		AdjacencyMatrix graph;
-		for (int i = 0; i < graph.side; ++i) {
-			for (int j = 0; j < graph.side; ++j) {
-				graphData.push_back(graph.matrix[i][j]);
+		std::string filePath = "../data/graph.dat"; // plik
+
+		AdjacencyMatrix graph(filePath);
+		matrixSide = graph.getSideSize();
+
+		for (int i = 0; i < matrixSide; ++i) {
+			for (int j = 0; j < matrixSide; ++j) {
+				graphData.push_back(graph.getMatrixValue(i, j));
 			}
 		}
-		matrixSide = graph.side;
 
 		numbersOfColumnsForEachProcess = divideGraphMatrixIntoChunks(graph, numberOfProcesses);
 		printMatrixColumnDistribution(numbersOfColumnsForEachProcess);
-		displacements = computeElementDisplacements(numbersOfColumnsForEachProcess, graph.side);
+		displacements = computeElementDisplacements(numbersOfColumnsForEachProcess, graph.getSideSize());
 
 		std::for_each(numbersOfColumnsForEachProcess.begin(), numbersOfColumnsForEachProcess.end(), [&] (auto& columns) mutable {
 			bufferSizes.push_back(columns * matrixSide);
@@ -126,7 +128,7 @@ int main(int argc, char* argv[])
 
 
 
-	
+
 
 	int numberOfColumnsToHandle = -1;
 	MPI_Scatter(numbersOfColumnsForEachProcess.data(), 1, MPI_INT, &numberOfColumnsToHandle, 1, MPI_INT, 0, MPI_COMM_WORLD);
