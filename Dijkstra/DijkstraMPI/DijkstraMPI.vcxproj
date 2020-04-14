@@ -145,12 +145,18 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Dijkstra_MPI.cpp" />
+    <ClCompile Include="DijkstraMPI.cpp" />
+    <ClCompile Include="DijkstraMPISetup.cpp" />
+    <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\DijkstraCommon\DijkstraCommon.vcxproj">
       <Project>{30eea1e4-b378-4e1c-a4fc-6cf8e2634d44}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="DijkstraMPI.h" />
+    <ClInclude Include="DijkstraMPISetup.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

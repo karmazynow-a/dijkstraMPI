@@ -4,11 +4,10 @@
 
 /// <summary>
 /// Simple helper class that contains static methods related to
-/// handling command line arguments. It is designed in such a way
-/// that validateCommandLineArguments() method should always be 
-/// called first.
+/// extracting command line arguments. It is designed in such a way
+/// that command line arguments should be validated before using it.
 /// </summary>
-class CommandLineArgumentsHandler final {
+class CommandLineArgumentsExtractor final {
 
 public:
 
@@ -16,26 +15,7 @@ public:
 	/// Since this class contains only static methods, its constructor
 	/// has been deleted.
 	/// </summary>
-	CommandLineArgumentsHandler() = delete;
-
-
-	/// <summary>
-	/// Simple command line arguments validator. User should provide at least
-	/// one argument - positive number indicating source vertex. 
-	/// </summary>
-	/// <returns>
-	/// Pair with boolean and c-style const string. Boolean indicates if 
-	/// command line arguments are valid. String contains error message. If
-	/// arguments are valid, this string is empty.
-	/// </returns>
-	/// <param name="argc">
-	/// Number of command line arguments.
-	/// </param>
-	/// <param name="argv">
-	/// C-style array with command line arguments. This method is designed in such
-	/// a way that argv should be passed to it directly from main function arguments.
-	/// </param>
-	static std::pair<bool, const char*> validateCommandLineArguments(int argc, char* argv[]);
+	CommandLineArgumentsExtractor() = delete;
 
 
 	/// <summary>
@@ -50,13 +30,16 @@ public:
 	/// C-style array with command line arguments. This method is designed in such
 	/// a way that argv should be passed to it directly from main function arguments.
 	/// </param>
-	static int extractSourceVertexIndexFromCommandLineArguments(char* argv[]);
+	static inline int extractSourceVertexIndexFromCommandLineArguments(char* argv[]) {
+		return std::stoi(argv[1]);
+	}
 
 
 	/// <summary>
 	/// Simple method that extracts data file name from command line arguments. This
 	/// name should be second command line argument given by user. If it has not been
-	/// provided, default value is returned. 
+	/// provided, default value is returned. This method assumes that command line 
+	/// arguments have been validated.
 	/// </summary>
 	/// <returns>
 	/// Data file name in form of a C++-style string.
@@ -68,7 +51,9 @@ public:
 	/// C-style array with command line arguments. This method is designed in such
 	/// a way that argv should be passed to it directly from main function arguments.
 	/// </param>
-	static std::string extractInputFileNameFromCommandLineArguments(int argc, char* argv[]);
+	static inline std::string extractInputFileNameFromCommandLineArguments(int argc, char* argv[]) {
+		return argc > 2 ? argv[2] : "../data/graph.dat";
+	}
 };
 
 

@@ -38,7 +38,7 @@ public:
 
 	/// <summary>
 	/// Returns matrix data in a form of continous 1D vector that contains
-	/// consecutive mathix columns.
+	/// consecutive matrix columns.
 	/// </summary>
 	/// <returns>
 	/// Vector of doubles that represents matrix data. Data in this vector
@@ -55,16 +55,6 @@ public:
 	/// </returns>
 	inline const std::vector<double>& asContinousVector() const {
 		return m_matrix;
-	}
-
-
-	// TODO: dopisac dokumentacje jesli ta funkcja wogole okaze sie konieczna
-	inline const std::vector<std::vector<double>> as2DMatrix() const {
-		std::vector<std::vector<double>> matrix2D(m_numberOfVertices, std::vector<double>(m_numberOfVertices, 0));
-		for (int i = 0; i < m_numberOfVertices; ++i) {
-			matrix2D.at(i) = std::vector<double>(m_matrix.begin() + i * m_numberOfVertices, m_matrix.begin() + (i + 1) * m_numberOfVertices);
-		}
-		return matrix2D;
 	}
 
 

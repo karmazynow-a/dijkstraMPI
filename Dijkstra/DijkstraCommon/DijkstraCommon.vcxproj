@@ -143,15 +143,16 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="AdjacencyMatrix.cpp" />
-    <ClCompile Include="CommandLineArgumentsHandler.cpp" />
+    <ClCompile Include="DijkstraAlgorithmBackend.cpp" />
     <ClCompile Include="ResultsPrinter.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AdjacencyMatrix.h" />
-    <ClInclude Include="CommandLineArgumentsHandler.h" />
-    <ClInclude Include="DijkstraAlgorithm.h" />
+    <ClInclude Include="CommandLineArgumentsExtractor.h" />
+    <ClInclude Include="DijkstraAlgorithmBackend.h" />
     <ClInclude Include="Log.h" />
     <ClInclude Include="ResultsPrinter.h" />
+    <ClInclude Include="Validator.h" />
     <ClInclude Include="VertexData.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

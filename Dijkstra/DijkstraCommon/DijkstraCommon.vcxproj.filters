@@ -18,10 +18,10 @@
     <ClCompile Include="AdjacencyMatrix.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="CommandLineArgumentsHandler.cpp">
+    <ClCompile Include="ResultsPrinter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ResultsPrinter.cpp">
+    <ClCompile Include="DijkstraAlgorithmBackend.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -29,19 +29,22 @@
     <ClInclude Include="AdjacencyMatrix.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="DijkstraAlgorithm.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Log.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="CommandLineArgumentsHandler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ResultsPrinter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="VertexData.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DijkstraAlgorithmBackend.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CommandLineArgumentsExtractor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Validator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

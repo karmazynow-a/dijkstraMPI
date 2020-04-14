@@ -8,9 +8,8 @@ void ResultsPrinter::printResultingDistances(const std::vector<double>& distance
 }
 
 
-// TODO: dodac obsluge przypadku jak nie da sie dotrzec 
-void ResultsPrinter::printResultingPaths(const std::vector<int>& predecessors) {
-	stream << "============ PATHS ============" << std::endl;
+void ResultsPrinter::printResultingPaths(const std::vector<int>& predecessors, int sourceVertexIndex) {
+	stream << "============= PATHS =============" << std::endl;
 	for (int i = 0; i < static_cast<int>(predecessors.size()); ++i) {
 		std::vector<int> path;
 		int currentVertex = i;
@@ -18,8 +17,13 @@ void ResultsPrinter::printResultingPaths(const std::vector<int>& predecessors) {
 			path.push_back(currentVertex);
 			currentVertex = predecessors.at(currentVertex);
 		}
-		for (int i = static_cast<int>(path.size()) - 1; i >= 0; --i) {
-			stream << path.at(i) << ", ";
+		if (std::find(path.begin(), path.end(), sourceVertexIndex) != path.end()) {
+			for (int i = static_cast<int>(path.size()) - 1; i >= 0; --i) {
+				stream << path.at(i) << ", ";
+			}
+		}
+		else {
+			stream << "Vertex " << i << " unreachable from source vertex.";
 		}
 		stream << std::endl;
 	}

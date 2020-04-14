@@ -1,5 +1,6 @@
 #pragma once
 
+#include <algorithm>
 #include <iostream>
 #include <vector>
 
@@ -17,8 +18,7 @@ public:
 	void printResultingDistances(const std::vector<double>& distances, int sourceVertexIndex);
 
 
-	// TODO: dodac obsluge przypadku jak nie da sie dotrzec 
-	void printResultingPaths(const std::vector<int>& predecessors);
+	void printResultingPaths(const std::vector<int>& predecessors, int sourceVertexIndex);
 
 
 private:

@@ -43,7 +43,7 @@ def saveToFile(matrix):
 	with open(fileName, 'w') as file:
 		file.write("{0}\n".format(len(matrix)))
 		# cut the matrix formatting
-		matFormat = ' {0}\n'.format(matrix).replace('[', '').replace(']', '')
+		matFormat = '\n'.join(['  '.join(['{:.4f}'.format(item) for item in row]) for row in matrix])
 		file.write(matFormat)
 
 if __name__ == '__main__':
