@@ -1,0 +1,73 @@
+
+%----------------------------------------------------------------------------------------
+%	PREAMBUŁA
+%----------------------------------------------------------------------------------------
+
+\documentclass[12pt]{article}
+\usepackage[polish]{babel}
+\usepackage[T1]{fontenc}
+\usepackage{polski}
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\usepackage{fancyhdr}
+\usepackage{float}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{verbatim}
+\usepackage{amsmath}
+\usepackage{rotating}
+
+\graphicspath{{static/}} 
+
+\title{Algorytm Dijkstra'y}
+\author{Arkadiusz Kasprzak, Aleksandra Poręba}
+
+\makeatletter
+\let\thetitle\@title
+\let\theauthor\@author
+\let\thedate\@date
+\makeatother
+
+%----------------------------------------------------------------------------------------
+%	STRONA TYTUŁOWA
+%----------------------------------------------------------------------------------------
+\begin{document}
+\begin{center}
+\textsc{\normalsize Wydział Fizyki i Informatyki Stosowanej}\\[2.0cm] 
+\includegraphics[scale = 1]{logo.png}\\[1cm] 
+\textsc{\Large Systemy równoległe i rozproszone}\\[0.4cm] 
+
+
+{ \huge \bfseries \LARGE{Drzewa wszystkich najkrótszych ścieżek - algorytm Dijkstra'y} }\\[0.2cm] 
+{ \huge \bfseries \LARGE{Aplikacja równoległa MPI} }\\[1cm] 
+
+\flushright \Large Arkadiusz Kasprzak \\ Aleksandra Poreba
+
+\vfill 
+
+\center {\today}\\[2cm] 
+
+
+\pagebreak 
+
+\end{center}
+
+%----------------------------------------------------------------------------------------
+%	SPIS TREŚCI
+%----------------------------------------------------------------------------------------
+\setcounter{tocdepth}{2}
+\tableofcontents
+\pagebreak
+
+%----------------------------------------------------------------------------------------
+%	ZAWARTOŚĆ
+%----------------------------------------------------------------------------------------
+
+\pagestyle{fancy}
+\fancyhf{}
+
+\rhead{\theauthor}
+\lhead{\thetitle}
+\cfoot{\thepage}
+
+\end{document}
