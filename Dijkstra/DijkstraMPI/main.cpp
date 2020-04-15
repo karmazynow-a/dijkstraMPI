@@ -27,15 +27,17 @@ int main(int argc, char* argv[])
 {
 	auto tStart = std::chrono::high_resolution_clock::now();
 
+	// initialize MPI
 	int numberOfProcesses = 0;
 	int processRank = 0;
-
 	MPI_Init(&argc, &argv);
 	MPI_Comm_size(MPI_COMM_WORLD, &numberOfProcesses);
 	MPI_Comm_rank(MPI_COMM_WORLD, &processRank);
 
+	// prepare Log class - initialize it with reference to standard output
 	Log<SHOULD_LOG> log(std::cout, processRank);
 	
+	// validate command line arguments
 	auto validationResult = Validator::validateCommandLineArguments(argc, argv);
 	if (!validationResult.first) {
 		log.logMessage(validationResult.second);
@@ -43,29 +45,37 @@ int main(int argc, char* argv[])
 		return 0;
 	}
 
-	std::vector<int> numbersOfColumnsForEachProcess; // ilosc kolumn, jakie obsluzy kazdy z procesow
+	// prepare structures used to transfer data from process 0 using MPI
+	std::vector<int> numbersOfColumnsForEachProcess;
 	std::vector<int> matrixChunksDisplacements;
 	std::vector<int> bufferSizes;
 	std::vector<double> graphData;
-
 	int totalNumberOfVertices = -1;
+
+	// read data from command line arguments
 	int sourceVertexIndex = CommandLineArgumentsExtractor::extractSourceVertexIndexFromCommandLineArguments(argv);
 
 	if (processRank == 0) {
 
+		// read data from command line arguments
 		std::string filePath = CommandLineArgumentsExtractor::extractInputFileNameFromCommandLineArguments(argc, argv);
+
+		// read graph data from file
 		std::unique_ptr<AdjacencyMatrix> matrix = AdjacencyMatrix::fromFile(filePath);
 		graphData = matrix->asContinousVector();
 		totalNumberOfVertices = matrix->getNumberOfVertices();
 
+		// prepare structures used to transfer data from process 0 using MPI
 		numbersOfColumnsForEachProcess = DijkstraMPISetup::divideGraphMatrixIntoChunks(totalNumberOfVertices, numberOfProcesses);
 		matrixChunksDisplacements = DijkstraMPISetup::computeDisplacements(numbersOfColumnsForEachProcess, totalNumberOfVertices);
 		bufferSizes = DijkstraMPISetup::computeBufferSizesForEachProcess(numbersOfColumnsForEachProcess, totalNumberOfVertices);
 
 	}
 
+	// broadcast graph size using MPI
 	MPI_Bcast(&totalNumberOfVertices, 1, MPI_INT, 0, MPI_COMM_WORLD);
 
+	// perform additional validation
 	validationResult = Validator::validateVerticesNumbers(totalNumberOfVertices, sourceVertexIndex);
 	if (!validationResult.first) {
 		log.logMessage(validationResult.second);
@@ -73,6 +83,7 @@ int main(int argc, char* argv[])
 		return 0;
 	}
 
+	// send graph data to all processes
 	int numberOfColumnsToHandle = -1;
 	MPI_Scatter(numbersOfColumnsForEachProcess.data(), 1, MPI_INT, &numberOfColumnsToHandle, 1, MPI_INT, 0, MPI_COMM_WORLD);
 
@@ -81,6 +92,7 @@ int main(int argc, char* argv[])
 		MPI_DOUBLE, matrixChunk.data(), numberOfColumnsToHandle * totalNumberOfVertices, MPI_DOUBLE, 0, MPI_COMM_WORLD);
 	graphData.clear();
 
+	// create new communicator - to distinguish idle processes from those that calculate algorithm
 	MPI_Comm activeProcessesCommunicator;
 	MPI_Comm_split(MPI_COMM_WORLD, numberOfColumnsToHandle > 0, processRank, &activeProcessesCommunicator);
 
@@ -91,7 +103,7 @@ int main(int argc, char* argv[])
 
 		auto tBeforeAlgorithmStart = std::chrono::high_resolution_clock::now();
 
-		// ALGORITHM
+		// run Dijkstra algorithm
 		DijkstraMPI dijkstraAlgorith(verticesToHandleRange, totalNumberOfVertices, sourceVertexIndex, matrixChunk);
 		auto dijkstraResult = dijkstraAlgorith.run(activeProcessesCommunicator);
 
@@ -101,9 +113,11 @@ int main(int argc, char* argv[])
 			resultsDisplacements = DijkstraMPISetup::computeDisplacements(numbersOfColumnsForEachProcess, 1);
 		}
 
+		// prepare structures for gathering results
 		std::vector<double> globalDistances(totalNumberOfVertices, 0);
 		std::vector<int> globalPredecessors(totalNumberOfVertices, -1);
 
+		// gather results
 		MPI_Gatherv(dijkstraResult.first.data(), numberOfColumnsToHandle, MPI_DOUBLE,
 			globalDistances.data(), numbersOfColumnsForEachProcess.data(), resultsDisplacements.data(),
 			MPI_DOUBLE, 0, activeProcessesCommunicator);
@@ -117,12 +131,16 @@ int main(int argc, char* argv[])
 		if (processRank == 0) {
 
 			auto tBeforePrinting = std::chrono::high_resolution_clock::now();
-			std::ofstream file("res.txt");
+
+			// print results to file
+			std::ofstream file("resultsMPI.txt");
 			ResultsPrinter resultsPrinter(file);
 			resultsPrinter.printResultingDistances(globalDistances, sourceVertexIndex);
 			resultsPrinter.printResultingPaths(globalPredecessors, sourceVertexIndex);
 
 			auto tEnd = std::chrono::high_resolution_clock::now();
+
+			// log information about elapsed time
 			std::chrono::duration<double> diff = tEnd - tStart;
 			std::chrono::duration<double> diffTotal = tEnd - tStart;
 			std::chrono::duration<double> diffSetup = tBeforeAlgorithmStart - tStart;
@@ -136,9 +154,9 @@ int main(int argc, char* argv[])
 
 	}
 
+	// finish using MPI
 	MPI_Comm_free(&activeProcessesCommunicator);
 	MPI_Finalize();
 
     return 0;
 }
-

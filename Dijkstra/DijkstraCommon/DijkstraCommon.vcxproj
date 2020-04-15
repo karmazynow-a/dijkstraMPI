@@ -145,6 +145,7 @@
     <ClCompile Include="AdjacencyMatrix.cpp" />
     <ClCompile Include="DijkstraAlgorithmBackend.cpp" />
     <ClCompile Include="ResultsPrinter.cpp" />
+    <ClCompile Include="Validator.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AdjacencyMatrix.h" />

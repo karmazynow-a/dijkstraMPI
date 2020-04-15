@@ -27,7 +27,9 @@ VertexData DijkstraAlgorithmBackend::findVertexWithMinimalDistanceToCluster() {
 			}
 		}
 	}
-	return (closestVertex != -1 ? VertexData(distances.at(closestVertex - verticesToHandleRange.first), closestVertex) : VertexData());
+	return (closestVertex != -1 
+		? createVertexDataInstance(distances.at(closestVertex - verticesToHandleRange.first), closestVertex) 
+		: createVertexDataInstance());
 }
 
 
