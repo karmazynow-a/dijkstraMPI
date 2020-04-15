@@ -1,0 +1,32 @@
+CMAKE_MINIMUM_REQUIRED( VERSION 3.0.0 )
+
+# Find and include MPI
+FIND_PACKAGE( MPI )
+INCLUDE_DIRECTORIES( SYSTEM ${MPI_INCLUDE_PATH} )
+
+
+# Set DijkstraMPI
+SET( MPI_NAME DijkstraMPI )
+
+SET( MPI_PATH ${CMAKE_SOURCE_DIR}/Dijkstra/DijkstraMPI )
+
+SET( LIB_NAME DijkstraCommon )
+
+SET( LIB_PATH ${CMAKE_SOURCE_DIR}/Dijkstra/DijkstraCommon )
+
+SET( MPI_HEADERS 
+    ${MPI_PATH}/DijkstraMPI.h 
+    ${MPI_PATH}/DijkstraMPISetup.h )
+
+SET( MPI_SOURCES 
+    ${MPI_PATH}/main.cpp 
+    ${MPI_PATH}/DijkstraMPI.cpp 
+    ${MPI_PATH}/DijkstraMPISetup.cpp )
+
+ADD_EXECUTABLE( ${MPI_NAME} ${MPI_SOURCES} ${MPI_HEADERS} ) 
+
+TARGET_INCLUDE_DIRECTORIES( ${MPI_NAME} PRIVATE ${MPI_PATH} ${LIB_PATH})
+
+
+# Link libraries
+TARGET_LINK_LIBRARIES( ${MPI_NAME} PUBLIC MPI::MPI_CXX ${LIB_NAME} )
