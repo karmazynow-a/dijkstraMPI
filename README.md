@@ -1,5 +1,20 @@
 # Dijkstra algorithm MPI
 
+## Building 
+For building the software you can use prepared `CMakeLists.txt`. The MPI 
+library is necessary, and Doxygen for documentation.
+
+Make options:
+
+    make clean-all      cleans the directory from build files
+    make doc            create Doxygen documentation
+    make runMPI         runs MPI algorithm with default parameter VERTEX=0
+    make runMPI VERTEX=V
+                        runs MPI algorithm with parameter VERTEX=V
+    make runSerial      runs serial algorithm with default parameter VERTEX=0
+    make runSerial VERTEX=V
+                        runs serial algorithm with parameter VERTEX=V
+
 ## Generate sample data
 Generate adjacency matrix representation of graph with given number of nodes
 and vertices.
