@@ -1,3 +1,10 @@
+/** 
+*	@mainpage Dijkstra algorithm implementations
+*	Dijkstra algorithm implementations created using C++ and MPI.
+*	@author Aleksandra Poreba 
+*	@author Arkadiusz Kasprzak
+*/
+
 #pragma once
 
 #include "VertexData.h"

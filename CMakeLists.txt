@@ -1,5 +1,11 @@
 CMAKE_MINIMUM_REQUIRED( VERSION 3.0.0 )
 
+# Check if proper build directory is being used
+GET_FILENAME_COMPONENT(BUILD_DIRECTORY ${CMAKE_BINARY_DIR} NAME)
+IF(NOT BUILD_DIRECTORY MATCHES "build")
+    MESSAGE(FATAL_ERROR "This project supports only out-of-source building from directory build. Create proper directory: mkdir build and call cmake from it.")
+ENDIF()
+
 # Include DijkstraCommon library
 ADD_SUBDIRECTORY( ${CMAKE_SOURCE_DIR}/Dijkstra/DijkstraCommon )
 
@@ -18,6 +24,9 @@ IF( DOXYGEN_FOUND )
     # set input and output files
     SET( DOXYGEN_IN ${CMAKE_SOURCE_DIR}/Doxyfile.in )
     SET( DOXYGEN_OUT ${CMAKE_SOURCE_DIR}/build/Doxyfile )
+    SET( DOXYGEN_GENERATE_LATEX NO )
+    SET( DOXYGEN_PROJECT_NAME "Dijkstra Algorithm Implementation" )
+    SET( DOXYGEN_PROJECT_BRIEF "This project contains various Dijkstra algorithm implementations (serial, MPI)." )
 
     # request to configure the file
     CONFIGURE_FILE( ${DOXYGEN_IN} ${DOXYGEN_OUT} @ONLY )
