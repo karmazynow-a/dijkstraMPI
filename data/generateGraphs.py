@@ -20,9 +20,9 @@ args = parser.parse_args()
 def main():
 	e = args.edges[0] 		# number of edges
 	v = args.vertices[0] 	# number of vertices
-	if e > v*(v-1)/2:
-		warnings.warn('Maximum number of edges for {0} verticles is {1}'.format(v, v*(v-1)/2))
-		e = np.random.randint(low = 0, high = v*(v-1)/2)
+	if e > v*(v-1):
+		warnings.warn('Maximum number of edges for {0} verticles is {1}'.format(v, v*(v-1)))
+		e = np.random.randint(low = 0, high = v*(v-1))
 		warnings.warn('Changing the number of edges to {0}'.format(e))
 
 	adj = np.zeros((v, v)) 	# adjacency matrix
@@ -31,8 +31,7 @@ def main():
 	while i < e:
 		n1, n2 = np.random.randint(low = 0, high = v, size = 2)
 		if n1 != n2 and adj[n1][n2] == 0:
-			adj[n1][n2] = adj[n2][n1] \
-				= round(np.random.uniform(low = 0, high = 10), 2)
+			adj[n1][n2] = round(np.random.uniform(low = 0, high = 10), 2)
 			i+=1
 
 	saveToFile(matrix = adj)
