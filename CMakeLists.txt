@@ -1,5 +1,8 @@
 CMAKE_MINIMUM_REQUIRED( VERSION 3.0.0 )
 
+# Logging
+ADD_DEFINITIONS( -DSHOULD_LOG=true )
+
 # Include DijkstraCommon library
 SET( COMMON_PATH /Dijkstra/DijkstraCommon )
 ADD_SUBDIRECTORY( ${CMAKE_SOURCE_DIR}${COMMON_PATH} )
