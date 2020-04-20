@@ -47,8 +47,7 @@ int main(int argc, char* argv[]) {
 	auto tBeforeAlgorithmStart = std::chrono::high_resolution_clock::now();
 
 	// run Dijkstra algorithm
-	std::pair<int, int> verticesToHandleRange(0, totalNumberOfVertices - 1);
-	DijkstraSerial dijkstraAlgorithm(verticesToHandleRange, totalNumberOfVertices, sourceVertexIndex, graphData);
+	DijkstraSerial dijkstraAlgorithm(totalNumberOfVertices, sourceVertexIndex, graphData);
 	auto dijkstraResults = dijkstraAlgorithm.run();
 
 	auto tBeforePrinting = std::chrono::high_resolution_clock::now();

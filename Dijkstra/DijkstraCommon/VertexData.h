@@ -1,3 +1,9 @@
+/**
+*	@file VertexData.h
+*	@brief This file contains simple helper structure designed to store
+*	vertex id and distance informations.
+*/
+
 #pragma once
 
 #include <limits>

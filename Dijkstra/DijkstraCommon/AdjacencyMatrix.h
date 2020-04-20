@@ -1,3 +1,9 @@
+/**
+*	@file AdjacencyMatrix.h
+*	@brief This file contains class responsible for loading from file
+*	and storing information about processed graph.
+*/
+
 #pragma once
 
 #include <vector>

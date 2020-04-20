@@ -1,3 +1,9 @@
+/**
+*	@file CommandLineArgumentsExtractor.h
+*	@brief This file contains simple helper class responsible for extracting
+*	command line arguments.
+*/
+
 #pragma once
 
 #include <string>

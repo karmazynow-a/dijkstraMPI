@@ -1,3 +1,8 @@
+/**
+*	@file Log.h
+*	@brief This file contains template classes responsible for logging.
+*/
+
 #pragma once
 
 #include <iostream>

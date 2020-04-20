@@ -1,3 +1,9 @@
+/**
+*	@file Validator.h
+*	@brief This file contains simple class responsible for validation, mainly used with
+*	command line arguments.
+*/
+
 #pragma once
 
 #include <utility>

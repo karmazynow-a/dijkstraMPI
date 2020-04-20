@@ -1,3 +1,9 @@
+/**
+*	@file ResultsPrinter.h
+*	@brief This file contains simple class responsible for printing algorithm
+*	result to standard output or file.
+*/
+
 #pragma once
 
 #include <algorithm>

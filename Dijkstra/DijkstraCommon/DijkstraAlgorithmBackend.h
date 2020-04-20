@@ -5,6 +5,13 @@
 *	@author Arkadiusz Kasprzak
 */
 
+/**
+*	@file DijkstraAlgorithmBackend.h
+*	@brief This file contains Dijkstra algorithm backend - methods which are 
+*	kind of building blocks that Dijkstra algorithm implementations can
+*	then reuse. 
+*/
+
 #pragma once
 
 #include "VertexData.h"
