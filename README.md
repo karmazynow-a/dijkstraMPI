@@ -7,6 +7,7 @@ library is necessary, and Doxygen for documentation.
 Make options:
 
     make clean-all      cleans the directory from build files
+    make install-all    move executables to root of binary dir
     make doc            create Doxygen documentation
     make runMPI         runs MPI algorithm with default parameter VERTEX=0 
                             and FILE="../data/grap.dat"
@@ -16,6 +17,10 @@ Make options:
                             and FILE="../data/grap.dat"
     make runSerial VERTEX=V FILE=F
                         runs serial algorithm with parameter VERTEX=V FILE=F
+
+If you want to generate docs make sure you run cmake with option:
+
+    cmake -DBUILD_DOC=ON
 
 ## Generate sample data
 Generate adjacency matrix representation of graph with given number of nodes

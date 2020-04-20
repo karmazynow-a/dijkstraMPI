@@ -14,7 +14,7 @@ ADD_SUBDIRECTORY( ${CMAKE_SOURCE_DIR}${SERIAL_PATH} )
 
 # Doxygen
 FIND_PACKAGE(Doxygen)
-# OPTION(BUILD_DOC "Build documentation" OFF)
+OPTION(BUILD_DOC "Build documentation" OFF)
 
 IF (BUILD_DOC)
     IF( DOXYGEN_FOUND )
@@ -44,26 +44,25 @@ SET( cmake_generated
     ${CMAKE_BINARY_DIR}/CMakeCache.txt
     ${CMAKE_BINARY_DIR}/CMakeDoxyfile.in
     ${CMAKE_BINARY_DIR}/CMakeDoxygenDefaults.cmake
-    ${CMAKE_BINARY_DIR}/cmake_install.cmake
     ${CMAKE_BINARY_DIR}/docs
     ${CMAKE_BINARY_DIR}/Doxyfile
     ${CMAKE_BINARY_DIR}/resultsSerial.txt
     ${CMAKE_BINARY_DIR}/resultsMPI.txt
     ${CMAKE_BINARY_DIR}/cmake_install.cmake
-    ${CMAKE_BINARY_DIR}/CMakeFiles
     ${CMAKE_BINARY_DIR}/Makefile
-    ${CMAKE_BINARY_DIR}${COMMON_PATH}/cmake_install.cmake
-    ${CMAKE_BINARY_DIR}${COMMON_PATH}/CMakeFiles
-    ${CMAKE_BINARY_DIR}${COMMON_PATH}/Makefile
-    ${CMAKE_BINARY_DIR}${COMMON_PATH}/libDijkstraCommon.a
+    ${CMAKE_BINARY_DIR}/CMakeFiles
     ${CMAKE_BINARY_DIR}${MPI_PATH}/cmake_install.cmake
-    ${CMAKE_BINARY_DIR}${MPI_PATH}/CMakeFiles
     ${CMAKE_BINARY_DIR}${MPI_PATH}/Makefile
-    ${CMAKE_BINARY_DIR}${MPI_PATH}/DijkstraMPI
+    ${CMAKE_BINARY_DIR}${MPI_PATH}/CMakeFiles
     ${CMAKE_BINARY_DIR}${SERIAL_PATH}/cmake_install.cmake
-    ${CMAKE_BINARY_DIR}${SERIAL_PATH}/CMakeFiles
     ${CMAKE_BINARY_DIR}${SERIAL_PATH}/Makefile
-    ${CMAKE_BINARY_DIR}${SERIAL_PATH}/DijkstraSerial )
+    ${CMAKE_BINARY_DIR}${SERIAL_PATH}/CMakeFiles
+    ${CMAKE_BINARY_DIR}${COMMON_PATH}/cmake_install.cmake
+    ${CMAKE_BINARY_DIR}${COMMON_PATH}/Makefile
+    ${CMAKE_BINARY_DIR}${COMMON_PATH}/CMakeFiles
+    ${CMAKE_BINARY_DIR}/*DijkstraSerial
+    ${CMAKE_BINARY_DIR}/*DijkstraMPI
+    ${CMAKE_BINARY_DIR}/*libDijkstraCommon.a  )
 
 ADD_CUSTOM_TARGET( 
     clean-all
@@ -72,6 +71,14 @@ ADD_CUSTOM_TARGET(
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
     COMMENT "Cleaning the directory" )
 
+# Install
+ADD_CUSTOM_TARGET( 
+    install-all
+    COMMAND cp ${CMAKE_BINARY_DIR}${MPI_PATH}/DijkstraMPI .
+    COMMAND cp ${CMAKE_BINARY_DIR}${SERIAL_PATH}/DijkstraSerial .
+    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+    DEPENDS DijkstraMPI DijkstraSerial
+    COMMENT "Run DijkstraSerial" )
 
 # Run
 ADD_CUSTOM_TARGET( 
