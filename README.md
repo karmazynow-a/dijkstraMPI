@@ -8,12 +8,14 @@ Make options:
 
     make clean-all      cleans the directory from build files
     make doc            create Doxygen documentation
-    make runMPI         runs MPI algorithm with default parameter VERTEX=0
-    make runMPI VERTEX=V
-                        runs MPI algorithm with parameter VERTEX=V
+    make runMPI         runs MPI algorithm with default parameter VERTEX=0 
+                            and FILE="../data/grap.dat"
+    make runMPI VERTEX=V FILE=F
+                        runs MPI algorithm with parameter VERTEX=V FILE=F
     make runSerial      runs serial algorithm with default parameter VERTEX=0
-    make runSerial VERTEX=V
-                        runs serial algorithm with parameter VERTEX=V
+                            and FILE="../data/grap.dat"
+    make runSerial VERTEX=V FILE=F
+                        runs serial algorithm with parameter VERTEX=V FILE=F
 
 ## Generate sample data
 Generate adjacency matrix representation of graph with given number of nodes
