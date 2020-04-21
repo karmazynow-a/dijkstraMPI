@@ -10,11 +10,11 @@ Make options:
     make install-all    move executables to root of binary dir
     make doc            create Doxygen documentation
     make runMPI         runs MPI algorithm with default parameter VERTEX=0 
-                            and FILE="../data/grap.dat"
+                            and FILE="../data/graph.dat"
     make runMPI VERTEX=V FILE=F
                         runs MPI algorithm with parameter VERTEX=V FILE=F
     make runSerial      runs serial algorithm with default parameter VERTEX=0
-                            and FILE="../data/grap.dat"
+                            and FILE="../data/graph.dat"
     make runSerial VERTEX=V FILE=F
                         runs serial algorithm with parameter VERTEX=V FILE=F
 

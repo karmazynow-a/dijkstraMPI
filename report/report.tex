@@ -5,7 +5,6 @@
 
 \documentclass[12pt]{article}
 \usepackage[polish]{babel}
-\usepackage[T1]{fontenc}
 \usepackage{polski}
 \usepackage[utf8]{inputenc}
 \usepackage{graphicx}
@@ -253,5 +252,86 @@ W ramach projektu zastosowane zostały następujące funkcjonalności MPI:
 
 \section{Testy projektu}
 \textbf{TODO:Wtorek}
+
+\section{Obsługa programu}
+\subsection{Kompilacja}
+Do kompilacji projektu został przygotowany \lstinline|CMakeLists.txt|. Za jego pomocą możemy utworzyć potrzebne biblioteki oraz pliki wykonywalne.
+
+\begin{lstlisting}[caption={Kompilacja programu.}, captionpos=b ]
+$ cmake CMakeLists.txt
+$ make
+\end{lstlisting}
+
+Aby kompilacja przeszła poprawnie wymagane jest posiadanie zainstalowanej biblioteki \lstinline|MPI|. Na pracowni wiąże się to z załadowaniem zmiennych środowiskowych przed kompilacją.
+
+\begin{lstlisting}[caption={Skonfigurowanie dostępu do pakietu MPI na pracowni.}, captionpos=b ]
+$ source /opt/nfs/config/source_mpich32.sh
+\end{lstlisting}
+
+\subsection{Uruchomienie} \label{sec:uru}
+
+Aby uruchomić program użytkownik może skorzystać z opcji udostępnianych w programie \lstinline|Makefile|. 
+\begin{itemize}
+\item  \lstinline|make runMPI| - uruchomiona zostaje równoległa wersja programu,
+\item  \lstinline|make runSerial| - uruchomiona zostaje sekwencyjna wersja programu.
+\end{itemize}
+
+Można skorzystać z domyślnych parametrów uruchomienia, lub podać własne:
+\begin{itemize}
+\item  \lstinline|VERTEX=V| - jako wierzchołek startowy zostanie wybrany wierzchołek \lstinline|V|, domyślną wartością jest $0$,
+\item  \lstinline|FILE=F| - jako plik wejściowy zostanie użyty plik \lstinline|F|, plik domyślny to $'../data/graph.dat'$.
+\end{itemize}
+
+\begin{lstlisting}[caption={Przykładowe uruchomienie programu.}, captionpos=b ]
+$ make runMPI VERTEX=1 FILE="../data/graph.dat"
+\end{lstlisting}
+
+Jeśli użytkownik nie chce skorzystać z udostępnionych opcji można również uruchomić pliki wykonywalne samodzielnie. Po wykonaniu komendy \lstinline|make install-all| zostaną one udostępnione w katalogu kompilacji. Jako argument należy podać kolejno numer wierzchołka startowego oraz plik wsadowy. Pierwszy argument jest obligatoryjny.
+
+\begin{lstlisting}[caption={Przykładowe uruchomienie programu z bezpośrednim użyciem plików wykonywalnych.}, captionpos=b ]
+$ make install-all
+$ ./DijkstraMPI 1 "../data/graph.dat"
+\end{lstlisting}
+
+Po uruchomieniu programu, jeśli zostało włączone logowanie, zostaną wyświetlone informacje na temat czasu wykonania. Znalezione ścieżki są zapisywane do plików odpowiednio \lstinline|resultMPI.txt| oraz \lstinline|resultSerial.txt|.
+
+\subsection{Dodatkowe opcje}
+Korzystając z udostępnionego \lstinline|CMakeLists.txt| można również włączyć dodatkowe opcje, takie jak:
+\begin{itemize}
+\item \lstinline+-DBUILD_DOC=ON|OFF+ generowanie dokumentacji \lstinline|Doxygen|, domyślnie ta opcja jest wyłączona,
+\item \lstinline+-DSHOULD_LOG=TRUE|FALSE+ włączenie/wyłączenie generowania logów w czasie działania programu.
+\end{itemize}
+
+Dostępne są również dodatkowe opcje programu \lstinline|Makefile|, takie jak:
+\begin{itemize}
+\item \lstinline| make clean-all | - przywrócenie zawartości podkatalogu do stanu wyjściowego,
+\item \lstinline| make install-all | - udostępnienie plików wykonywalnych w podkatalogu,
+\item \lstinline| make doc |  - wygenerowanie dokumentacji \lstinline|Doxygen|,
+\item \lstinline| make runMPI |  - uruchomienie programu w wersji równoległej, opisane w punkcie \ref{sec:uru},
+\item \lstinline| make runSerial |  - uruchomienie programu w wersji sekwencyjnej, opisane w punkcie  \ref{sec:uru},
+\end{itemize}
+
+\subsection{Generowanie grafów}
+W ramach projektu został udostępniony dodatkowy skrypt  \lstinline|generateGraphs.py|. Służy on do generowania grafów skierowanych o wybranej przez użytkownika liczbie wierzchołków i krawędzi. Znajduje się on w katalogu \lstinline|\data|. Dostępne są opcje:
+\begin{itemize}
+\item \lstinline|-h| - pomoc skryptu,
+\item \lstinline|-e| - liczba krawędzi w grafie, jeśli wartość nie została podana, ustawiana jest wartość domyślna $=10$,
+\item \lstinline|-v| - liczba wierzchołków w grafie, wartość domyślna $=10$,
+\item \lstinline|-f| - nazwa pliku wyjściowego, domyślna nazwa to $'graph.dat'$.
+\end{itemize}
+
+Jeśli wartość krawędzi jest zbyt duża dla danej liczby wierzchołków, użytkownik zostaje poinformowany i zostaje ustawiona nowa, losowa wartość.
+
+\begin{lstlisting}[caption={Pomoc skryptu \lstinline|generateGraphs|.}, captionpos=b ]
+generateGraphs.py [-h] [-e E] [-v V] [-f FILE]
+
+optional arguments:
+	-h, --help            show this help message and exit
+	-e E, --edges E       number of edges
+	-v V, --vertices V    number of vertices
+	-f FILE, --file FILE  name of output file
+\end{lstlisting}
+
+Wygenerowane grafy za pomocą tego skryptu można użyć jako plik wejściowy do programu.
 
 \end{document}
