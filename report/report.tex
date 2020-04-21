@@ -122,8 +122,12 @@ Dijkstra(V, E, v)
 				p(w) := u
 \end{lstlisting}
 
+\subsection{Aplikacje równoległe MPI}
+Aplikacje równoległe charakteryzują się możliwością działania na wielu procesorach (rdzeniach) równocześnie. Wiąże się to z podziałem problemu na mniejsze fragmenty, które mogą wykonywać się niezależnie od siebie. Wynik działania programu powstaje przez połączenie poszczególnych rozwiązań.
 
-\subsection{Aplikacje równoległe}
+Do implementacji aplikacji rozproszonych powstał standard MPI (\textit{Message Passage Interface}), który stanowi protokół komunikacyjny pomiędzy równoległymi procesami. Odbywa się to za pomocą jawnie przekazywanych komunikatów. Możliwe są różne rodzaje komunikacji, na przykład typu punkt-punkt pomiędzy dwoma procesami (\lstinline|MPI_Send|, \lstinline|MPI_Recv|), albo komunikacja grupowa, gdzie bierze udział wiele procesów (na przykład \lstinline|MPI_Bcast|, \lstinline|MPI_Reduce|). Standard MPI jest wysocy wydajny i umożliwia efektywną obsługą dużej ilości procesów.
+
+W projekcie została użyta biblioteka \lstinline|MPICH| będąca implementacją standardu MPI.
 
 \section{Budowa projektu}
 W tej części dokumentacji opisana została budowa przygotowanego projektu - zarówno jeśli chodzi o podział projektu na komponenty (biblioteki), jak i na poszczególne klasy. Nie jest to natomiast dokumentacja kodu - ta została przygotowana odrębnie, w postaci zbioru dokumentów HTML, przy pomocy narzędzia \textit{Doxygen}.
