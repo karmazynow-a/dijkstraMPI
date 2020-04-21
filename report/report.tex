@@ -96,6 +96,35 @@
 \lhead{\thetitle}
 \cfoot{\thepage}
 
+\section{Wstęp}
+
+\subsection{Algorytm Dijkstry}
+Implementowany w projekcie algorytm Dijkstry jest algorytmem poszukiwania najkrótszych ścieżek z pojedynczego, wybranego wierzchołka do wszystkich pozostałych. 
+
+Oparty jest on na metodzie zachłannej, w każdym kroku wybierany jest wierzchołek, do którego koszt dojścia jest najmniejszy. 
+
+\begin{lstlisting}[caption={Pseudokod algorytmu Dijkstry.}, captionpos=b, mathescape=true]
+V - zbiór wierzcholkow
+E - zbiór krawedzi z wagami
+v - wierzcholek startowy
+
+Dijkstra(V, E, v)
+	Q := V;
+	p := null;
+	d := $\infty$
+	d(v) := 0
+	dopoki Q != $\emptyset$ wykonaj
+		wybierz ze zbioru Q wierzcholek u o najmniejszym koszcie dojscia d(u)
+		Q := Q \ {u}
+		dla kazdego sasiada w wierzcholka u, ktory nalezy do zbioru  Q wykonaj
+			jesli d(w) > d(u) + E(w, u) to
+				d (w) :=  d(u) + E(w, u)
+				p(w) := u
+\end{lstlisting}
+
+
+\subsection{Aplikacje równoległe}
+
 \section{Budowa projektu}
 W tej części dokumentacji opisana została budowa przygotowanego projektu - zarówno jeśli chodzi o podział projektu na komponenty (biblioteki), jak i na poszczególne klasy. Nie jest to natomiast dokumentacja kodu - ta została przygotowana odrębnie, w postaci zbioru dokumentów HTML, przy pomocy narzędzia \textit{Doxygen}.
 
@@ -321,6 +350,8 @@ W ramach projektu został udostępniony dodatkowy skrypt  \lstinline|generateGra
 \end{itemize}
 
 Jeśli wartość krawędzi jest zbyt duża dla danej liczby wierzchołków, użytkownik zostaje poinformowany i zostaje ustawiona nowa, losowa wartość.
+
+Wagi krawędzi są nieujemnymi liczbami rzeczywistymi, z zakresu $[0, 10]$.
 
 \begin{lstlisting}[caption={Pomoc skryptu \lstinline|generateGraphs|.}, captionpos=b ]
 generateGraphs.py [-h] [-e E] [-v V] [-f FILE]
