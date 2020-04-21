@@ -112,9 +112,9 @@ ADD_CUSTOM_TARGET(
             echo "If you want to host file add argument to command: make runMPI HOSTS=?" \; 
             echo "Running without hosts file" \; 
             echo "" \;
-            mpirun -n $$N ${CMAKE_CURRENT_BINARY_DIR}${MPI_PATH}/DijkstraMPI $$VERTEX $$FILE \;
+            mpiexec -n $$N ${CMAKE_CURRENT_BINARY_DIR}${MPI_PATH}/DijkstraMPI $$VERTEX $$FILE \;
         else
-            mpirun -n $$N -f $$HOSTS ${CMAKE_CURRENT_BINARY_DIR}${MPI_PATH}/DijkstraMPI $$VERTEX $$FILE \;
+            mpiexec -n $$N -f $$HOSTS ${CMAKE_CURRENT_BINARY_DIR}${MPI_PATH}/DijkstraMPI $$VERTEX $$FILE \;
         fi \;
 
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}

@@ -309,17 +309,19 @@ Można skorzystać z domyślnych parametrów uruchomienia, lub podać własne:
 \begin{itemize}
 \item  \lstinline|VERTEX=V| - jako wierzchołek startowy zostanie wybrany wierzchołek \lstinline|V|, domyślną wartością jest $0$,
 \item  \lstinline|FILE=F| - jako plik wejściowy zostanie użyty plik \lstinline|F|, plik domyślny to $'../data/graph.dat'$.
+\item  \lstinline|N=N| - parametr \lstinline|mpiexec| ustalający ilość procesów dla węzła, wartość domyślna jest równa $1$,
+\item  \lstinline|HOSTS=H| -  parametr \lstinline|mpiexec|, plik wejściowy z węzłami.
 \end{itemize}
 
 \begin{lstlisting}[caption={Przykładowe uruchomienie programu.}, captionpos=b ]
-$ make runMPI VERTEX=1 FILE="../data/graph.dat"
+$ make runMPI VERTEX=1 FILE="../data/graph.dat" N=5
 \end{lstlisting}
 
 Jeśli użytkownik nie chce skorzystać z udostępnionych opcji można również uruchomić pliki wykonywalne samodzielnie. Po wykonaniu komendy \lstinline|make install-all| zostaną one udostępnione w katalogu kompilacji. Jako argument należy podać kolejno numer wierzchołka startowego oraz plik wsadowy. Pierwszy argument jest obligatoryjny.
 
 \begin{lstlisting}[caption={Przykładowe uruchomienie programu z bezpośrednim użyciem plików wykonywalnych.}, captionpos=b ]
 $ make install-all
-$ ./DijkstraMPI 1 "../data/graph.dat"
+$ mpiexec -n 5 ./DijkstraMPI 1 "../data/graph.dat"
 \end{lstlisting}
 
 Po uruchomieniu programu, jeśli zostało włączone logowanie, zostaną wyświetlone informacje na temat czasu wykonania. Znalezione ścieżki są zapisywane do plików odpowiednio \lstinline|resultMPI.txt| oraz \lstinline|resultSerial.txt|.
@@ -340,7 +342,22 @@ Dostępne są również dodatkowe opcje programu \lstinline|Makefile|, takie jak
 \item \lstinline| make runSerial |  - uruchomienie programu w wersji sekwencyjnej, opisane w punkcie  \ref{sec:uru},
 \end{itemize}
 
-\subsection{Generowanie grafów}
+\subsection{Dane wejściowe}
+Program jako jedną z danych wejściowych przyjmuje plik z grafem zapisanym w postaci macierzy sąsiedztwa.
+W pierwszej linii pliku powinna znajdować się ilość wierzchołków.
+
+\begin{lstlisting}[caption={Przykładowy graf zapisany w odpowiednim formacie.}, captionpos=b ]
+5
+0.0000  0.0000  0.0000  8.2700  0.0000
+4.2000  0.0000  8.5200  0.0000  0.0000
+3.0700  0.0000  0.0000  0.0000  7.7700
+0.0000  0.0000  7.4900  0.0000  0.0000
+9.5700  6.9400  7.7900  6.6900  0.0000
+\end{lstlisting}
+
+Do wygenerowania takiego pliku można użyć skryptu pomocniczego \lstinline|generateGraphs.py| opisanego w sekcji \label{sec:gen_g}.
+
+\subsection{Generowanie grafów} \label{sec:gen_g}
 W ramach projektu został udostępniony dodatkowy skrypt  \lstinline|generateGraphs.py|. Służy on do generowania grafów skierowanych o wybranej przez użytkownika liczbie wierzchołków i krawędzi. Znajduje się on w katalogu \lstinline|\data|. Dostępne są opcje:
 \begin{itemize}
 \item \lstinline|-h| - pomoc skryptu,
