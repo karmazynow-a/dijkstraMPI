@@ -100,7 +100,22 @@ ADD_CUSTOM_TARGET(
             echo "" \;
             FILE="../data/graph.dat" \;
         fi \;
-        ${CMAKE_CURRENT_BINARY_DIR}${MPI_PATH}/DijkstraMPI $$VERTEX $$FILE \;
+        if [ -z "$$N" ] \;
+        then 
+            echo "If you want to specify number of processes add argument to command: make runMPI N=?" \; 
+            echo "Running with default value: make runMPI N=1" \; 
+            echo "" \;
+            N=1 \;
+        fi \;
+        if [ -z "$$HOSTS" ] \;
+        then 
+            echo "If you want to host file add argument to command: make runMPI HOSTS=?" \; 
+            echo "Running without hosts file" \; 
+            echo "" \;
+            mpirun -n $$N ${CMAKE_CURRENT_BINARY_DIR}${MPI_PATH}/DijkstraMPI $$VERTEX $$FILE \;
+        else
+            mpirun -n $$N -f $$HOSTS ${CMAKE_CURRENT_BINARY_DIR}${MPI_PATH}/DijkstraMPI $$VERTEX $$FILE \;
+        fi \;
 
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
     COMMENT "Run DijkstraMPI" )
