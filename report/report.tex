@@ -199,7 +199,7 @@ Implementacja algorytmu Dijkstra'y za pomocą protokołu MPI nie różni się w 
 \item tablica odległości (kosztów) od wierzchołka źródłowego do każdego z wierzchołków w grafie
 \item tablica poprzedników każdego z wierzchołków - służy do odtworzenia najkrótszych ścieżek między wierzchołkami
 \end{itemize}
-oraz zbiór obsłużonych wierzchołków (często nazywany klastrem). Początkowo zbiór ten jest pusty, tablica kosztów zainicjalizowana jest nieskończonościami, a tablica poprzedników wartościami -1. Różnica w stosunku to szeregowej wersji algorytmu jest taka, że w przypadku implementacji równoległej każdy z procesów przechowuje \textbf{fragmenty tych tablic} odpowiadające przydzielonym im procesom.
+oraz zbiór obsłużonych wierzchołków (często nazywany klastrem). Początkowo zbiór ten jest pusty, tablica kosztów zainicjalizowana jest nieskończonościami, a tablica poprzedników wartościami -1. Różnica w stosunku to szeregowej wersji algorytmu jest taka, że w przypadku implementacji równoległej każdy z procesów przechowuje \textbf{fragmenty tych tablic} odpowiadające przydzielonym im wierzchołkom grafu.
 
 W procesie obsługującym wierzchołek źródłowy jego wpis w tablicy kosztów ustawiany jest na wartość 0. Następnie, dopóki wszystkie wierzchołki nie zostały przetworzone, wykonywany jest w pętli algorytm:
 \begin{itemize}
@@ -211,7 +211,7 @@ W procesie obsługującym wierzchołek źródłowy jego wpis w tablicy kosztów 
 \end{itemize}
 Po zakończeniu działania algorytmu fragmenty tablic kosztów i poprzedników są łączone w całość za pomocą operacji \lstinline{MPI_Gatherv}. Proces \lstinline{root} wyznacza ścieżki z wierzchołka źródłowego do każdego wierzchołka w grafie i zapisuje wyniki do pliku. Następnie wyświetlany jest czas działania algorytmu. Ostatnim krokiem jest zwolnienie utworzonego wcześniej komunikatora, wywołanie operacji \lstinline{MPI_Finalize} i zakończenie działania programu.
 
-W kilku miejscach w programie tworzona jest zmienna zawierająca aktualny czas. Pod koniec działania, proces \lstinline{root} zbiera te informacje i wyświetla czas wykonywania się każdej z trzech części algorytmu:
+W kilku miejscach w programie tworzona jest zmienna zawierająca aktualny czas. Pod koniec działania, proces \lstinline{root} zbiera te informacje i wyświetla czas wykonywania się każdej z trzech części programu:
 \begin{lstlisting}
 [Process 0] Total elapsed time: 0.0298846s
 [Process 0] Setup took: 0.0260188s
