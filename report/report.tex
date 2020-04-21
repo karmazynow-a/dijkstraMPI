@@ -12,10 +12,37 @@
 \usepackage{fancyhdr}
 \usepackage{float}
 \usepackage{graphicx}
-\usepackage{hyperref}
+\usepackage[hidelinks]{hyperref}
 \usepackage{verbatim}
 \usepackage{amsmath}
 \usepackage{rotating}
+\usepackage{listings}
+\usepackage{xcolor}
+
+\definecolor{lgray}{gray}{0.96}
+\definecolor{lbcolor}{rgb}{0.9,0.9,0.9}
+\lstset{
+    framesep=2pt,
+    basicstyle=\ttfamily,
+    breaklines=true,
+    breakatwhitespace=true,
+    basicstyle=\footnotesize,
+    aboveskip={0.75\baselineskip},
+    columns=fixed,
+    showstringspaces=false,
+    breaklines=true,
+    prebreak = \raisebox{0ex}[0ex][0ex]{\ensuremath{\hookleftarrow}},
+    frame=single,
+    rulecolor=\color{lgray},
+    showtabs=false,
+    showspaces=false,
+    showstringspaces=false,
+    backgroundcolor=\color{lgray},
+    identifierstyle=\ttfamily,
+    keywordstyle=\color[rgb]{0,0,1},
+    commentstyle=\color[rgb]{0.0,0.26,0.15},
+    stringstyle=\color[rgb]{0.627,0.126,0.941}
+}
 
 \graphicspath{{static/}} 
 
@@ -69,5 +96,162 @@
 \rhead{\theauthor}
 \lhead{\thetitle}
 \cfoot{\thepage}
+
+\section{Budowa projektu}
+W tej części dokumentacji opisana została budowa przygotowanego projektu - zarówno jeśli chodzi o podział projektu na komponenty (biblioteki), jak i na poszczególne klasy. Nie jest to natomiast dokumentacja kodu - ta została przygotowana odrębnie, w postaci zbioru dokumentów HTML, przy pomocy narzędzia \textit{Doxygen}.
+
+\subsection{Podział na komponenty}
+Projekt podzielony został na trzy główne komponenty:
+\begin{itemize}
+\item \lstinline{DijkstraCommon} - biblioteka statyczna zawierająca klasy oraz funkcje współdzielone przez pozostałe dwa komponenty. W jej skład wchodzą klasy odpowiedzialne za: zapis wyników obliczeń, walidację danych podanych przez użytkownika, przechowywanie danych na temat przetwarzanego grafu i jego poszczególnych wierzchołków czy przetwarzanie argumentów linii poleceń. Zawiera również klasę \lstinline{DijkstraAlgorithmBackend} stanowiącą szkielet implementowanego algorytmu.
+\item \lstinline{DijkstraSerial} - implementacja algorytmu bez użycia protokołu MPI, czyli w formie klasycznego algorytmu szeregowego. Komponent ten został dołączony do projektu jako punkt odniesienia w procesie testowania wydajności implementacji równoległej. Zawiera funkcję \lstinline{main}.
+\item \lstinline{DijkstraMPI} - implementacja algorytmu używająca protokołu MPI. Jest to jedyny komponent projektu używający tej biblioteki. Zawiera funkcję \lstinline{main}.
+\end{itemize}
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.35\textwidth]{static/DijkstraArch1.pdf}
+\caption{Komponenty wchodzące w skład projektu wraz z wzajemnymi zależnościami.}
+\label{fig:arch1}
+\end{figure}
+
+Zależności między poszczególnymi komponentami przedstawia rysunek \ref{fig:arch1}. Na niebiesko oznaczone zostały komponenty produkujące plik wykonywalny, na czerwono natomiast biblioteki. Każdy z komponentów znajduje się w osobnym katalogu o nazwie odpowiadającej nazwie komponentu.
+
+
+\subsection{Klasy w projekcie}
+\textbf{TODO:Wtorek}
+
+\newpage
+\section{Działanie projektu}
+W tej części dokumentacji omówiony zostanie sposób działania implementacji algorytmu Dijkstra'y wykorzystującej protokół MPI. Algorytm składa się z trzech głównych części:
+\begin{itemize}
+\item inicjalizacja - podział danych wejściowych na części, walidacja, rozesłanie danych do poszczególnych procesów
+\item obliczenie odległości i ścieżek (algorytm Dijkstra'y)
+\item zapisanie wyników do pliku i zakończenie działania programu
+\end{itemize}
+
+
+\subsection{Inicjalizacja}
+Pierwsza część programu składa się z kilku mniejszych etapów. Na początku ma miejsce standardowa inicjalizacja protokołu MPI oraz przypisanie każdemu z procesów rangi. Kolejnym etapem jest utworzenie klasy odpowiedzialnej za wyświetlanie informacji o przebiegu programu na standardowe wyjście. W dalszej kolejności przetwarzane i walidowane są dane wejściowe - numer wierzchołka stanowiącego źródło oraz ścieżka do pliku z danymi wejściowymi. W przypadku, gdy dane są niepoprawne, program kończy działanie wyświetlając odpowiedni komunikat.
+
+Następnie odbywa się przede wszystkim podział danych wejściowych na części i rozesłanie ich do poszczególnych procesów. Program przyjmuje informacje na temat przetwarzanego grafu w postaci tzw. \textbf{macierzy sąsiedztwa}. W i-tym rzędzie i j-tej kolumnie takiej macierzy znajduje się waga przypisana do krawędzi łączącej wierzchołek $i$ z wierzchołkiem $j$. W przypadku braku krawędzi waga wynosi 0. Rysunek \ref{fig:am1} przedstawia przykład tego typu reprezentacji wraz z odpowiadającym jej grafem.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{static/AdjacencyMatrixExample.pdf}
+\caption{Przykładowa macierz sąsiedztwa wraz z odpowiadającym jej grafem skierowanym.}
+\label{fig:am1}
+\end{figure}
+
+Macierz sąsiedztwa wczytywana jest z pliku z danymi wejściowymi przez proces główny (proces \lstinline{root} o identyfikatorze 0). Proces ten dokonuje podziału macierzy na części zgodnie z ilością procesów biorących udział w wykonaniu algorytmu. Każdy z procesów otrzymuje k kolumn oryginalnej macierzy w formie ciągłego obszaru pamięci - przykładowy podział dla grafu o 5 wierzchołkach i 3 procesów przedstawia rysunek \ref{fig:am2}.
+
+Algorytm podziału jest prosty. Dana jest macierz o $n$ kolumnach i $m$ procesów. Najpierw każdemu z procesów przypisywane jest:
+\begin{equation}
+a = \left\lfloor \frac{n}{m} \right\rfloor
+\end{equation}
+kolumn - w przypadku $n = 5$ i $m = 3$ każdy proces otrzymuje domyślnie jedną kolumnę. Ilość pozostałych kolumn dana jest zależnością:
+\begin{equation}
+k = n \mod m
+\end{equation}
+W analizowanym przykładzie jest to $k = 2$. Kolumny te rozdzielane są po jednej pomiędzy k pierwszych (zgodnie z numeracją nadaną przez MPI) procesów. Ostatecznie w omawianym przykładzie proces zerowy i pierwszy otrzymują po dwie kolumny, proces drugi otrzymuje natomiast tylko jedną kolumnę.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{static/MatrixSplit.pdf}
+\caption{Przykładowy podział macierzy sąsiedztwa reprezentującej graf o 5 wierzchołkach. W wykonaniu algorytmu biorą udział 3 procesy.}
+\label{fig:am2}
+\end{figure}
+
+Kolumny przypisywane są każdemu procesowi po kolei, tzn. proces 0 otrzymuje $x_0$ pierwszych kolumn macierzy, proces 1 kolejne $x_1$ itd. Zbiór kolumn reprezentowany jest za pomocą jednowymiarowej tablicy - ułożone są w niej kolejno dane z pierwszej, drugiej itd. kolumny.
+
+Po dokonaniu przez proces \lstinline{root} podziału, do każdego z procesów wysyłane są trzy informacje:
+\begin{itemize}
+\item całkowita liczba wierzchołków w przetwarzanym grafie - wysyłanie odbywa się za pomocą operacji kolektywnej \lstinline{MPI_Bcast}
+\item ilość kolumn macierzy sąsiedztwa, jaka każdy z procesów będzie musiał obsłużyć. Informacja ta jest w tym momencie potrzebna, ponieważ każdy z procesów musi przygotować sobie odpowiednio duży bufor na dane z samej macierzy. Wysyłanie tej informacji odbywa się za pomocą operacji \lstinline{MPI_Scatter}, ponieważ każdy z procesów otrzymuje swoją indywidualną informację.
+\item zawartość kolumn macierzy sąsiedztwa, które będą przetwarzane przez dany proces. Wysyłanie tej informacji odbywa się za pomocą funkcji \lstinline{MPI_Scatterv}, ponieważ jest ona w stanie obsłużyć wysyłanie innej ilości danych do każdego z procesów.
+\end{itemize}
+
+Po zakończeniu wysyłania danych następuje podział procesów na dwie grupy: procesy które otrzymały przynajmniej jedną kolumnę oraz takie, które nie otrzymały żadnej (ma to miejsce, gdy do wykonania algorytmu przydzielone zostaje więcej procesów, niż przetwarzany graf posiada wierzchołków). W tym celu za pomocą operacji \lstinline{MPI_Comm_split} komunikator globalny dzielony jest na dwa komunikatory. Kryterium podziału stanowi tutaj właśnie sprawdzenie, czy procesowi zostały przydzielone kolumny macierzy do obsługi (\lstinline{numberOfColumnsToHandle > 0}). Pozwala to wykluczyć nadmiarowe procesy z dalszego przebiegu algorytmu.
+
+Przebieg procesu inicjalizacji jest komunikowany użytkownikowi - na standardowym wyjściu pojawiają się odpowiednie informacje. Poniżej zamieszczono przykład takich informacji wygenerowany dla przykładu widocznego na rysunku \ref{fig:am2}:
+
+\begin{lstlisting}
+[Process 0] This process will handle 2 vertices in range [0, 1]
+[Process 1] This process will handle 2 vertices in range [2, 3]
+[Process 2] This process will handle 1 vertices in range [4, 4]
+...
+\end{lstlisting}
+
+Rysunek \ref{fig:diagram1} przedstawia \textbf{schemat blokowy} ilustrujący przebieg procesu inicjalizacji.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{static/Diagram1.pdf}
+\caption{Schemat blokowy ilustrujący przebieg procesu inicjalizacji.}
+\label{fig:diagram1}
+\end{figure}
+
+
+\subsection{Implementacja i zakończenie algorytmu}
+Początek właściwej części programu stanowi sprawdzenie, czy danemu procesowi przydzielone zostały wierzchołki grafu (czyli kolumny macierzy sąsiedztwa) do przetworzenia. Jeśli nie, to taki proces nie bierze udziału w dalszym wykonaniu algorytmu - następuje dealokacja utworzonego komunikatora i zakończenie działania. W przeciwnym wypadku proces przystępuje do realizacji algorytmu. 
+
+Implementacja algorytmu Dijkstra'y za pomocą protokołu MPI nie różni się w sposób znaczący od klasycznej implementacji szeregowej. Każdy z procesów obsługuje dwie tablice: 
+\begin{itemize}
+\item tablica odległości (kosztów) od wierzchołka źródłowego do każdego z wierzchołków w grafie
+\item tablica poprzedników każdego z wierzchołków - służy do odtworzenia najkrótszych ścieżek między wierzchołkami
+\end{itemize}
+oraz zbiór obsłużonych wierzchołków (często nazywany klastrem). Początkowo zbiór ten jest pusty, tablica kosztów zainicjalizowana jest nieskończonościami, a tablica poprzedników wartościami -1. Różnica w stosunku to szeregowej wersji algorytmu jest taka, że w przypadku implementacji równoległej każdy z procesów przechowuje \textbf{fragmenty tych tablic} odpowiadające przydzielonym im procesom.
+
+W procesie obsługującym wierzchołek źródłowy jego wpis w tablicy kosztów ustawiany jest na wartość 0. Następnie, dopóki wszystkie wierzchołki nie zostały przetworzone, wykonywany jest w pętli algorytm:
+\begin{itemize}
+\item każdy proces wybiera spośród przydzielonych mu wierzchołków taki, który nie został jeszcze dodany do zbioru wierzchołków obsłużonych i którego wartość w tablicy kosztów jest najmniejsza
+\item za pomocą operacji \lstinline{MPI_Allreduce} wybierany jest wierzchołek o globalnie najniższej wartości kosztu (czyli najlepszy spośród najlepszych z każdego procesu)
+\item jeśli nie został wyznaczony taki wierzchołek, to następuje wyjście z pętli i zakończenie algorytmu
+\item w przeciwnym razie wierzchołek zostaje dodany do zbioru wierzchołków przetworzonych (w każdym procesie zbiór ten jest przechowywany osobno, w całości)
+\item dla każdego nieprzetworzonego sąsiada wyznaczonego wierzchołka dokonywana jest aktualizacja w tablicy kosztów i poprzedników (wybrany wierzchołek staje się poprzednikiem swoich sąsiadów), jeśli nowy koszt okazuje się niższy od dotychczasowego
+\end{itemize}
+Po zakończeniu działania algorytmu fragmenty tablic kosztów i poprzedników są łączone w całość za pomocą operacji \lstinline{MPI_Gatherv}. Proces \lstinline{root} wyznacza ścieżki z wierzchołka źródłowego do każdego wierzchołka w grafie i zapisuje wyniki do pliku. Następnie wyświetlany jest czas działania algorytmu. Ostatnim krokiem jest zwolnienie utworzonego wcześniej komunikatora, wywołanie operacji \lstinline{MPI_Finalize} i zakończenie działania programu.
+
+W kilku miejscach w programie tworzona jest zmienna zawierająca aktualny czas. Pod koniec działania, proces \lstinline{root} zbiera te informacje i wyświetla czas wykonywania się każdej z trzech części algorytmu:
+\begin{lstlisting}
+[Process 0] Total elapsed time: 0.0298846s
+[Process 0] Setup took: 0.0260188s
+[Process 0] Algorithm took: 0.0020106s
+[Process 0] Printing solution took: 0.0018552s
+\end{lstlisting}
+Wyświetlane są wyniki pomiarów dokonanych jedynie w procesie głównym - wyniki z pozostałych procesów są pomijane. Pomiar wykonywany jest z użyciem biblioteki \lstinline{chrono} z C++11.
+
+Rysunek \ref{fig:diagram2} przedstawia schemat blokowy ilustrujący przebieg działania algorytmu po inicjalizacji. Kolorem fioletowym oznaczony został blok związany z główną pętlą algorytmu Dijkstra'y. Schemat ten nie zawiera szczegółów jej działania.
+
+Rysunek \ref{fig:diagram3} przedstawia schemat blokowy ilustrujący działania głównej pętli algorytmu Dijkstra'y. Schemat ten stanowi rozwinięcie fioletowego bloku z rysunku \ref{fig:diagram2}.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{static/Diagram2.pdf}
+\caption{Schemat blokowy ilustrujący przebieg głównej części programu wraz z zapisaniem wyników i zakończeniem. Schemat nie zawiera implementacji algorytmu Dijkstra'y.}
+\label{fig:diagram2}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{static/Diagram3.pdf}
+\caption{Schemat blokowy ilustrujący przebieg głównej pętli algorytmu Dijkstra'y.}
+\label{fig:diagram3}
+\end{figure}
+
+
+\subsection{Zastosowane funkcjonalności MPI}
+\textbf{TODO:Wtorek}
+W ramach projektu zastosowane zostały następujące funkcjonalności MPI:
+\begin{itemize}
+\item operacja kolektywna \lstinline{MPI_Bcast}
+\item operacja kolektywna \lstinline{MPI_Scatter}
+\item operacja \lstinline{MPI_Scatterv}
+\item operacja \lstinline{MPI_Gatherv}
+\item operacja \lstinline{MPI_Allreduce}
+\item tworzenie nowego komunikatora za pomocą \lstinline{MPI_Comm_split}
+\end{itemize}
+
+\section{Testy projektu}
+\textbf{TODO:Wtorek}
 
 \end{document}
