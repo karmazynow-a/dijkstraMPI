@@ -15,7 +15,7 @@ LIB_HEADERS = \
 
 
 $(MPI_NAME): $(S_OBJ)
-	$(CXX) -o $@ $^ $(LDFLAGS)
+	$(CXX) -o $@ $^ $(LDFLAGS) -I$(LIB_HEADERS)
 
 %.o : %.cpp -I$(S_HEADERS) -I$(LIB_HEADERS)
 	$(CXX) -o $@ $<

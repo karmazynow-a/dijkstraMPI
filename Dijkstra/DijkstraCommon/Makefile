@@ -12,9 +12,9 @@ LIB_HEADERS = \
 
 LIB_OBJ = \
         DijkstraAlgorithmBackend.o \
-		AdjacencyMatrix.o \
-		ResultsPrinter.o \
-		Validator.o
+	AdjacencyMatrix.o \
+	ResultsPrinter.o \
+	Validator.o
 
 
 $(LIB_NAME): $(LIB_OBJ)

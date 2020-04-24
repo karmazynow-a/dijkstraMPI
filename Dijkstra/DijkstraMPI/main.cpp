@@ -5,7 +5,7 @@
 #include <chrono>
 #include <fstream>
 
-#include <mpi.h>
+#include "mpi.h"
 
 #include "AdjacencyMatrix.h"
 #include "Log.h"
