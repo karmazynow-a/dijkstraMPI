@@ -2,7 +2,7 @@
 .PHONY: all clean docs install
 
 
-all: buildSerial buildMPI
+all: buildMPI buildSerial 
 	
 buildLib:
 	$(MAKE) -C ../Dijkstra/DijkstraCommon/
