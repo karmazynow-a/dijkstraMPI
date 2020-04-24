@@ -3,22 +3,21 @@ LIB_DIR = ../DijkstraCommon
 LDFLAGS = -static -L$(LIB_DIR) -lDijkstraCommon
 
 S_NAME = DijkstraSerial
-S_HEADERS = \
-	DijkstraSerial.h 
 
 S_OBJ = \
-	main.o \
-    DijkstraSerial.o
+      main.o \
+      DijkstraSerial.o
 
 LIB_HEADERS = \
-	$(LIB_DIR)/DijkstraAlgorithmBackend.h 
+      -I$(LIB_DIR)/AdjacencyMatrix.h \
+      -I$(LIB_DIR)/DijkstraAlgorithmBackend.h
 
 
-$(MPI_NAME): $(S_OBJ)
-	$(CXX) -o $@ $^ $(LDFLAGS) -I$(LIB_HEADERS)
+$(S_NAME): $(S_OBJ)
+	$(CXX) -o $@ $^ $(LDFLAGS)
 
-%.o : %.cpp -I$(S_HEADERS) -I$(LIB_HEADERS)
-	$(CXX) -o $@ $<
+%.o : %.cpp
+	$(CXX) -c $< -o $@ -I. -I$(LIB_DIR)
 
 .PHONY: all clean
 
