@@ -7,7 +7,7 @@
 
 #include <iostream>
 #include <string>
-
+#include <sstream>
 
 /// <summary>
 /// Simple template class designed for logging purposes. Its template parameter
@@ -40,7 +40,7 @@ public:
 	/// Method used for information logging. Uses variadic templates to take as
 	/// many arguments as needed (one or more). Please note that those arguments
 	/// will be used with ostream operator. Before messages, special tag is printed
-	/// (it contains process rank, for example: [Process 1] ). At the end, endl is
+	/// (it contains process rank, for example: [Process 1] ). At the end, end of line is
 	/// used.
 	/// </summary>
 	/// <param name="informations">
@@ -50,9 +50,11 @@ public:
 	/// </param>
 	template<typename... Ts>
 	void logMessage(const Ts& ... informations) {
-		stream << "[Process " << processRank << "] ";
-		logMessageBackend(informations...);
-		stream << std::endl;
+		std::ostringstream strs;
+	       	strs << "[Process " << processRank << "] ";
+		logMessageBackend(strs, informations...);
+		strs << "\n";
+		stream << strs.str();
 	}
 
 private:
@@ -61,17 +63,17 @@ private:
 	/// Backend method specialization for one argument.
 	/// </summary>
 	template<typename T>
-	void logMessageBackend(const T& information) {
-		stream << information;
+	void logMessageBackend(std::ostringstream& strs, const T& information) {
+		strs << information;
 	}
 
 	/// <summary>
 	/// Backend method that uses variadic templates to print all messages. 
 	/// </summary>
 	template<typename T, typename... Ts>
-	void logMessageBackend(const T& information, const Ts& ... informations) {
-		stream << information;
-		logMessageBackend(informations...);
+	void logMessageBackend(std::ostringstream& strs, const T& information, const Ts& ... informations) {
+		strs << information;
+		logMessageBackend(strs, informations...);
 	}
 
 	std::ostream& stream;
