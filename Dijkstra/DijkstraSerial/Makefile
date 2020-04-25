@@ -14,14 +14,14 @@ LIB_HEADERS = \
 
 
 $(S_NAME): $(S_OBJ)
-	$(CXX) -o $@ $^ $(LDFLAGS)
+	@$(CXX) -o $@ $^ $(LDFLAGS)
 
 %.o : %.cpp
-	$(CXX) -c $< -o $@ -I. -I$(LIB_DIR)
+	@$(CXX) -c $< -o $@ -I. -I$(LIB_DIR)
 
 .PHONY: all clean
 
 all: $(S_NAME) 
 
 clean:
-	rm -rf *.o $(S_NAME)
+	@rm -rf *.o $(S_NAME)

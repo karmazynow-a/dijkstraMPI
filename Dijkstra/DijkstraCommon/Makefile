@@ -18,10 +18,10 @@ LIB_OBJ = \
 
 
 $(LIB_NAME): $(LIB_OBJ)
-	ar crf $(LIB_NAME) $^
+	@ar crf $(LIB_NAME) $^
 
 %.o : %.cpp
-	$(CXX) -c $< -o $@
+	@$(CXX) -c $< -o $@
 
 $(LIB_OBJ) : $(LIB_HEADERS)
 
@@ -30,4 +30,4 @@ $(LIB_OBJ) : $(LIB_HEADERS)
 all: $(LIB_NAME) 
 
 clean:
-	rm -rf *.o $(LIB_NAME)
+	@rm -rf *.o $(LIB_NAME)

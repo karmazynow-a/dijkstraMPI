@@ -1,0 +1,7 @@
+OUTPUT_DIRECTORY = ./docs/
+INPUT            = ../Dijkstra/
+RECURSIVE        = YES
+PROJECT_NAME     = DijkstraMPI
+GENERATE_LATEX   = NO
+FULL_PATH_NAMES  = YES
+STRIP_FROM_PATH  = ..

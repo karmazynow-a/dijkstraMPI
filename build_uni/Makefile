@@ -5,31 +5,42 @@
 all: buildMPI buildSerial 
 	
 buildLib:
-	$(MAKE) -C ../Dijkstra/DijkstraCommon/
+	@echo "Building library DijkstraCommon..."
+	@$(MAKE) -C ../Dijkstra/DijkstraCommon/
 
 buildSerial: buildLib
-	$(MAKE) -C ../Dijkstra/DijkstraSerial/
+	@echo "Building DijkstraSerial..."
+	@$(MAKE) -C ../Dijkstra/DijkstraSerial/
 
-buildMPI : buildLib
-	$(MAKE) -C ../Dijkstra/DijkstraMPI/
+buildMPI: buildLib
+	@echo "Building DijkstraMPI..."
+	@$(MAKE) -C ../Dijkstra/DijkstraMPI/
 
 install: installMPI installSerial
 
 installMPI: buildMPI
-	cp ../Dijkstra/DijkstraMPI/DijkstraMPI .
+	@echo "Installing DijkstraMPI..."
+	@cp ../Dijkstra/DijkstraMPI/DijkstraMPI .
 
 installSerial: buildSerial
-	cp ../Dijkstra/DijkstraSerial/DijkstraSerial .
+	@echo "Installing DijkstraSerial..."
+	@cp ../Dijkstra/DijkstraSerial/DijkstraSerial .
 
 clean:
-	cd ../Dijkstra/DijkstraCommon/ && $(MAKE) clean
-	cd ../Dijkstra/DijkstraMPI/ && $(MAKE) clean
-	cd ../Dijkstra/DijkstraSerial/ && $(MAKE) clean
+	@echo "Cleaning the directory..."
+	@cd ../Dijkstra/DijkstraCommon/ && $(MAKE) clean
+	@cd ../Dijkstra/DijkstraMPI/ && $(MAKE) clean
+	@cd ../Dijkstra/DijkstraSerial/ && $(MAKE) clean
+	@rm -f DijkstraMPI DijkstraSerial
+	@rm -f resultsMPI.txt resultsSerial.txt
+	@rm -rf docs/
 
 docs:
-	doxygen ../Doxyfile.in
+	@echo "Generating docs..."
+	@doxygen Doxyfile_uni.in
 
 runMPI: installMPI
+	@echo "Running DijkstraMPI..."
 	@if [ -z $$VERTEX ] ;\
         then \
             echo "If you want to pass own vertex add argument to command: make runMPI VERTEX=?" ;\
@@ -62,16 +73,17 @@ runMPI: installMPI
     fi \
 
 runSerial: installSerial
+	@echo "Running DijkstraSerial..."
 	@if [ -z $$VERTEX ] ;\
         then \
-            echo "If you want to pass own vertex add argument to command: make runMPI VERTEX=?" ;\
+            echo "If you want to pass own vertex add argument to command: make runSerial VERTEX=?" ;\
             echo "Running with default value: make runSerial VERTEX=0" ;\
             echo "" ;\
             VERTEX=0 ;\
     fi ;\
     if [ -z $$FILE ] ;\
         then \
-            echo "If you want to pass own file add argument to command: make runMPI FILE=?" ;\
+            echo "If you want to pass own file add argument to command: make runSerial FILE=?" ;\
             echo "Running with default value: make runSerial FILE=''../data/graph.dat''" ;\
             echo "" ;\
             FILE="../data/graph.dat" ;\

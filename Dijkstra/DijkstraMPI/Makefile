@@ -18,14 +18,14 @@ LIB_HEADERS = -I$(LIB_DIR)
 
 
 $(ALG_NAME): $(ALG_OBJ)
-	$(MPICXX) -o $@ $^ $(LDFLAGS)
+	@$(MPICXX) -o $@ $^ $(LDFLAGS)
 
 %.o: %.cpp 
-	$(MPICXX) $(ALG_LIB) $(LIB_HEADERS) -c $< -o $@ -I.
+	@$(MPICXX) $(ALG_LIB) $(LIB_HEADERS) -c $< -o $@ -I.
 
 .PHONY: all clean
 
 all: $(ALG_NAME)
 
 clean:
-	rm -rf *.o $(ALG_NAME)
+	@rm -rf *.o $(ALG_NAME)
