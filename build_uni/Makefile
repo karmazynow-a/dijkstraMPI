@@ -69,7 +69,7 @@ runMPI: installMPI
             echo "" ;\
             mpiexec -n $$N ./DijkstraMPI $$VERTEX $$FILE ;\
         else \
-            mpiexec -n $$N -f $$HOSTS ./DijkstraMPI $$VERTEX $$FILE ;\
+            mpiexec -f $$HOSTS -n $$N ./DijkstraMPI $$VERTEX $$FILE ;\
     fi \
 
 runSerial: installSerial

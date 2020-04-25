@@ -307,7 +307,7 @@ W ramach projektu zastosowane zostały następujące funkcjonalności MPI:
 Niniejsza część dokumentacji przedstawia informacje związane z kompilacją i uruchomieniem projektu.
 
 \subsection{Kompilacja}
-Do kompilacji projektu został przygotowany plik \lstinline|CMakeLists.txt|. Za jego pomocą możliwe jest wygenerowanie pliku \lstinline{Makefile} służącego do kompilacji. Preferowanym sposobem użycia tego pliku jest tzw. użycie \textit{out-of-source} z katalogu \lstinline{build}. Znajdując się w katalogu głównym projektu należy wykonać następujące operację:
+Do kompilacji projektu został przygotowany plik \lstinline|CMakeLists.txt|. Za jego pomocą możliwe jest wygenerowanie pliku \lstinline{Makefile} służącego do kompilacji. Preferowanym sposobem użycia tego pliku jest tzw. użycie \textit{out-of-source} z katalogu \lstinline{build}. Znajdując się w katalogu głównym projektu należy wykonać następujące operacje:
 \begin{lstlisting}
 $ mkdir build
 $ cd build
@@ -411,6 +411,53 @@ optional arguments:
 \end{lstlisting}
 
 Grafy wygenerowane przy pomocy tego skryptu mogą zostać użyte jako dane wejściowe do programu.
+
+\subsection{Obsługa programu na pracowni}
+Z racji niedostępności programu \lstinline|CMake| na pracowni, zostały przygotowane dedykowane pliki \lstinline|Makefile| do obsługi programu. Plik przeznaczony do użycia przez użytkownika znajduje się w katalogu \lstinline|build_uni| wraz z odpowiednim plikiem do generacji dokumentacji.
+
+\subsubsection{Skrypt Makefile}
+
+Udostępnione zostały następujące opcje dla skryptu \lstinline|Makefile|:
+\begin{itemize}
+\item \lstinline|make install| - udostępnienie plików wykonywalnych w podkatalogu,
+\item \lstinline|make runMPI|  -  uruchomienie programu w wersji równoległej, opisane w punkcie \ref{sec:uru},
+\item \lstinline|make runSerial|  - uruchomienie programu w wersji sekwencyjnej, opisane w punkcie  \ref{sec:uru},
+\item \lstinline|make docs| - wygenerowanie dokumentacji \lstinline|Doxygen|, 
+\item \lstinline|make clean| - przywrócenie zawartości podkatalogu do stanu wyjściowego.
+\end{itemize}
+
+\subsubsection{Uruchomienie}
+Aby uruchomić program z przykładowymi argumentami należy wykonać następujące operacje (zakładając, że użytkownik znajduje się w katalogu głównym projektu):
+\begin{lstlisting}
+$ cd build_uni
+$ source /opt/nfs/config/source_mpich32.sh
+$ make runMPI
+\end{lstlisting}
+
+Szczególnie istotnym punktem jest załadowanie odpowiednich zmiennych środowiskowych.
+
+Uruchomienie programu bez użycia \lstinline|make runMPI| wygląda następująco:
+\begin{lstlisting}
+$ cd build_uni
+$ source /opt/nfs/config/source_mpich32.sh
+$ make installMPI
+$ mpiexec -n 5 DijkstraMPI 1 "../data/graph.dat"
+\end{lstlisting}
+
+W podobny sposób jak powyższe możemy uruchomić wersję sekwencyjną, oczywiście z odpowiednim kompilatorem.
+
+\subsubsection{Plik wejściowy z węzłami}
+
+Aby wygenerować plik wejściowy z węzłami, który może zostać użyty do uruchomienia wersji równoległej należy wykonać następujące polecenia:
+\begin{lstlisting}
+$ cd build_uni
+$ /opt/nfs/config/station_name_list.sh 201 216 > nodes
+\end{lstlisting}
+
+Tak wygenerowany plik można podać jako argument wykonania:
+\begin{lstlisting}
+$ make runMPI HOSTS="nodes"
+\end{lstlisting}
 
 \newpage
 \begin{thebibliography}{9}

@@ -114,7 +114,7 @@ ADD_CUSTOM_TARGET(
             echo "" \;
             mpiexec -n $$N ${CMAKE_CURRENT_BINARY_DIR}${MPI_PATH}/DijkstraMPI $$VERTEX $$FILE \;
         else
-            mpiexec -n $$N -f $$HOSTS ${CMAKE_CURRENT_BINARY_DIR}${MPI_PATH}/DijkstraMPI $$VERTEX $$FILE \;
+            mpiexec -f $$HOSTS -n $$N ${CMAKE_CURRENT_BINARY_DIR}${MPI_PATH}/DijkstraMPI $$VERTEX $$FILE \;
         fi \;
 
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
