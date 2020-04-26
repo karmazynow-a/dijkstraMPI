@@ -17,6 +17,7 @@
 \usepackage{rotating}
 \usepackage{listings}
 \usepackage{xcolor}
+\usepackage{subcaption}
 
 \definecolor{lgray}{gray}{0.96}
 \definecolor{lbcolor}{rgb}{0.9,0.9,0.9}
@@ -26,7 +27,7 @@
     breakatwhitespace=true,
     basicstyle=\footnotesize,
     aboveskip={0.75\baselineskip},
-    columns=fixed,
+    columns=flexible,
     showstringspaces=false,
     breaklines=true,
     prebreak = \raisebox{0ex}[0ex][0ex]{\ensuremath{\hookleftarrow}},
@@ -122,12 +123,10 @@ Dijkstra(V, E, v)
 
 W czasie wykonania algorytmu program operuje na dwóch tablicach - jedna z nich, zwykle oznaczana literą \lstinline{d}, przechowuje koszty dotarcia z wierzchołka źródłowego do każdego z wierzchołków w badanym grafie. Druga, oznaczana literą \lstinline{p}, przechowuje informację o poprzedniku każdego z wierzchołków - taka informacja pozwala po zakończeniu działania algorytmu odtworzyć ścieżkę z wierzchołka źródłowego do każdego z wierzchołków w grafie.
 
-\subsection{Aplikacje równoległe MPI}
-Aplikacje równoległe charakteryzują się możliwością działania na wielu procesorach (rdzeniach) równocześnie. Wiąże się to z podziałem problemu na mniejsze fragmenty, które mogą wykonywać się niezależnie od siebie. Wynik działania programu powstaje przez połączenie poszczególnych rozwiązań.
+\subsection{Zastosowane technologie}
+Przygotowana aplikacja napisana została we języku C++ (w standardzie C++11). Do jej implementacji zastosowany został standard MPI (\textit{Message Passing Interface}), który stanowi protokół komunikacyjny pomiędzy równoległymi procesami. Odbywa się to za pomocą jawnie przekazywanych komunikatów. Możliwe są różne rodzaje komunikacji, na przykład typu punkt-punkt pomiędzy dwoma procesami (\lstinline|MPI_Send|, \lstinline|MPI_Recv|), albo komunikacja grupowa, gdzie bierze udział wiele procesów (na przykład \lstinline|MPI_Bcast|, \lstinline|MPI_Reduce|). Standard MPI jest wysocy wydajny i umożliwia efektywną obsługą dużej ilości procesów. W projekcie została użyta biblioteka \lstinline|MPICH| będąca implementacją standardu MPI. Pomocnicze skrypty napisane zostały w języku Python. System budowania oparty został na narzędziu CMake, jednak z uwagi na fakt, iż narzędzie to nie jest dostępne na komputerach pracowni wydziału, przygotowany został dodatkowy zestaw plików Makefile.
 
-Do implementacji aplikacji rozproszonych powstał standard MPI (\textit{Message Passage Interface}), który stanowi protokół komunikacyjny pomiędzy równoległymi procesami. Odbywa się to za pomocą jawnie przekazywanych komunikatów. Możliwe są różne rodzaje komunikacji, na przykład typu punkt-punkt pomiędzy dwoma procesami (\lstinline|MPI_Send|, \lstinline|MPI_Recv|), albo komunikacja grupowa, gdzie bierze udział wiele procesów (na przykład \lstinline|MPI_Bcast|, \lstinline|MPI_Reduce|). Standard MPI jest wysocy wydajny i umożliwia efektywną obsługą dużej ilości procesów.
 
-W projekcie została użyta biblioteka \lstinline|MPICH| będąca implementacją standardu MPI.
 
 \newpage
 \section{Budowa projektu}
@@ -299,30 +298,133 @@ W ramach projektu zastosowane zostały następujące funkcjonalności MPI:
 \item operacje \lstinline{MPI_Comm_split} oraz \lstinline{MPI_Comm_free} - w celu utworzenia i zwolnienia nowego komunikatora. Pozwala to wykluczyć bierne (nadmiarowe) procesy z udziału w wykonywaniu algorytmu.
 \end{itemize}
 
+\newpage
 \section{Testy projektu}
-\textbf{TODO:Wtorek}
+Działanie przygotowanego programu zostało przetestowane ze względu na poprawność działania i wydajność. Niniejsza część dokumentacji zawiera opis przeprowadzonych testów wydajnościowych. Przeprowadzone zostały one zdalnie na komputerach pracowni Wydziału Fizyki i Informatyki Stosowanej AGH. Badane były dwie wielkości:
+\begin{itemize}
+\item czas wykonania się całego programu (z perspektywy procesu o identyfikatorze 0)
+\item czas wykonania się części algorytmicznej programu (z pominięciem wstępnej konfiguracji, rozsyłania danych oraz zapisu wyników do pliku)
+\end{itemize}
+Do testów użyte zostały grafy składające się kolejno z: 5, 10, 50, 100, 500, 1000, 2000, 3000, 4000 i 5000 wierzchołków. W każdym z przypadków ilość krawędzi grafu dana była zależnością:
+\begin{equation}
+k = \frac{n(n-1)}{2}
+\end{equation}
+czyli było to około połowy wszystkich możliwych krawędzi. Do testów użyte zostały wszystkie dostępne węzły. Program uruchamiany był zarówno w wersji sekwencyjnej (\lstinline{DijkstraSerial}), jak i zrównoleglonej (\lstinline{DijkstraMPI}). W tym drugim przypadku zastosowane zostały następujące liczby procesów: 1, 4, 16, 64. Dla każdej kombinacji danych wejściowych i liczby procesów przeprowadzone zostały 3 próby, z których wyciągana była następnie średnia.
+
+\vspace{5mm}
+Rysunek \ref{fig:testall} przedstawia wyniki uzyskane w badaniach czasu wykonania się całego programu. Legendy obu wykresów zawierają opis wykorzystanej konfiguracji (\lstinline{serial} lub liczba procesów w konfiguracji \lstinline{MPI}). Wykres \ref{fig:testall1} przedstawia wyniki pomiarów dla małej liczby wierzchołków - od 50 do 100. W tym wypadku wyraźnie widoczny jest spadek wydajności wynikający z użycia MPI - dla tak niewielkich danych wejściowych proces konfiguracji środowiska jest na tyle kosztowny, że jego użycie jest nieopłacalne. 
+
+\begin{figure}[H]
+\centering
+
+\begin{subfigure}{\textwidth}
+\centering
+\includegraphics[width=0.8\textwidth]{static/total_times_begin.pdf}
+\caption{Pomiary dla małego rozmiaru danych wejściowych.}
+\label{fig:testall1}
+\end{subfigure}
+
+\begin{subfigure}{\textwidth}
+\centering
+\includegraphics[width=0.8\textwidth]{static/total_times.pdf} 
+\caption{Pomiary dla wszystkich możliwości liczby wierzchołków.}
+\label{fig:testall2}
+\end{subfigure}
+
+\caption{Wyniki testów działania programu - pomiar całościowego czasu działania.}
+\label{fig:testall}
+\end{figure}
+
+Inaczej wygląda jednak sytuacja przedstawiona na rysunku \ref{fig:testall2}. Można zaobserwować, że dla dużej liczby wierzchołków (ponad 1000) aplikacja działająca sekwencyjnie oraz wariant MPI wykorzystujący tylko jeden proces znacznie tracą na wydajności. Dla 5000 wierzchołków zysk z użycia 16 i 64 procesów jest ponad dwukrotny. Należy jednak zauważyć, że dla takiego rozmiaru danych nie było opłacalne użycie aż 64 procesów - czas wykonania był taki sam jak w przypadku zaledwie 16.
+
+\vspace{5mm}
+Rysunek \ref{fig:testag} przedstawia pomiary analogiczne do poprzednich, ale wykonane tylko dla części programu realizującej algorytm Dijkstry. Podobnie jak poprzednio, dla małej wielkości danych wejściowych użycie dużej liczby procesów jest nieopłacalne. Tym razem jednak zależność nie jest stała - jest to funkcja rosnąca, zgodnie z oczekiwaniami. Jest tak ponieważ na pomiar całości programu duży wpływ miała inicjalizacja, w tym czytanie danych z pliku. Podobnie jak wcześniej, również w tym przypadku dla dużych danych wejściowych (od około 1000 wierzchołków) zysk z użycia większej liczby procesów staje się widoczny. Wyniki uzyskane w tym teście są znacznie bardziej zróżnicowane niż poprzednio - pokazuje to, jak duży wpływ ma działanie programu miało czytanie pliku z danymi w pierwszym etapie wykonania. W tym wypadku widoczny staje się również zysk z użycia większej niż 16 liczby procesów.
+
+\vspace{5mm}
+Podsumowując, wykorzystując więcej niż jeden proces można uzyskać znaczną poprawę wydajności, pod warunkiem ze dane mają odpowiednio duży rozmiar.
+
+\begin{figure}[H]
+\centering
+
+\begin{subfigure}{\textwidth}
+\centering
+\includegraphics[width=0.8\textwidth]{static/algo_times_begin.pdf}
+\caption{Pomiary dla małego rozmiaru danych wejściowych.}
+\label{fig:testag1}
+\end{subfigure}
+
+\begin{subfigure}{\textwidth}
+\centering
+\includegraphics[width=0.8\textwidth]{static/algo_times.pdf} 
+\caption{Pomiary dla wszystkich możliwości liczby wierzchołków.}
+\label{fig:testag2}
+\end{subfigure}
+
+\caption{Wyniki testów działania programu - pomiar działania części realizującej algorytm.}
+\label{fig:testag}
+\end{figure}
+
 
 \newpage
 \section{Obsługa programu}
 Niniejsza część dokumentacji przedstawia informacje związane z kompilacją i uruchomieniem projektu.
 
+\subsection{Obsługa programu na pracowni WFiIS}
+Z racji niedostępności narzędzia \lstinline|CMake| na pracowni, zostały przygotowane dedykowane pliki \lstinline|Makefile| do obsługi programu. Pliki przeznaczony do użycia przez użytkownika znajduje się w katalogu \lstinline|build_uni|.
+
+\subsubsection{Skrypt Makefile}
+
+Udostępnione zostały następujące opcje dla skryptu \lstinline|Makefile|:
+\begin{itemize}
+\item \lstinline|make install| - udostępnienie plików wykonywalnych w podkatalogu,
+\item \lstinline|make runMPI|  -  uruchomienie programu w wersji równoległej, opisane w punkcie \ref{sec:uru},
+\item \lstinline|make runSerial|  - uruchomienie programu w wersji sekwencyjnej, opisane w punkcie  \ref{sec:uru},
+\item \lstinline|make docs| - wygenerowanie dokumentacji \lstinline|Doxygen|, 
+\item \lstinline|make clean| - przywrócenie zawartości podkatalogu do stanu wyjściowego.
+\end{itemize}
+
+\subsubsection{Uruchomienie}
+Aby uruchomić program z przykładowymi argumentami należy wykonać następujące operacje (zakładając, że użytkownik znajduje się w katalogu głównym projektu):
+\begin{lstlisting}
+$ cd build_uni
+$ source /opt/nfs/config/source_mpich32.sh
+$ make runMPI
+\end{lstlisting}
+
+\noindent
+Szczególnie istotnym punktem jest załadowanie odpowiednich zmiennych środowiskowych. Uruchomienie programu bez użycia \lstinline|make runMPI| wygląda następująco:
+\begin{lstlisting}
+$ cd build_uni
+$ source /opt/nfs/config/source_mpich32.sh
+$ make installMPI
+$ mpiexec -n 5 DijkstraMPI 1 "../data/graph.dat"
+\end{lstlisting}
+
+\noindent
+W podobny sposób jak powyższe możemy uruchomić wersję sekwencyjną.
+
+\subsubsection{Plik wejściowy z węzłami}
+
+Aby wygenerować plik wejściowy z węzłami, który może zostać użyty do uruchomienia wersji równoległej należy wykonać następujące polecenia:
+\begin{lstlisting}
+$ cd build_uni
+$ /opt/nfs/config/station_name_list.sh 201 216 > nodes
+\end{lstlisting}
+
+\noindent
+Tak wygenerowany plik można podać jako argument wykonania:
+\begin{lstlisting}
+$ make runMPI HOSTS="nodes"
+\end{lstlisting}
+
+
 \subsection{Kompilacja}
-Do kompilacji projektu został przygotowany plik \lstinline|CMakeLists.txt|. Za jego pomocą możliwe jest wygenerowanie pliku \lstinline{Makefile} służącego do kompilacji. Preferowanym sposobem użycia tego pliku jest tzw. użycie \textit{out-of-source} z katalogu \lstinline{build}. Znajdując się w katalogu głównym projektu należy wykonać następujące operacje:
+ Przygotowany został plik \lstinline|CMakeLists.txt|, za którego pomocą możliwe jest wygenerowanie pliku \lstinline{Makefile} służącego do kompilacji. Preferowanym sposobem użycia tego pliku jest tzw. użycie \textit{out-of-source} z katalogu \lstinline{build}. Znajdując się w katalogu głównym projektu należy wykonać następujące operacje:
 \begin{lstlisting}
 $ mkdir build
 $ cd build
 $ cmake ..
 $ make
-\end{lstlisting}
-
-Aby kompilacja zakończyła się powodzeniem wymagane jest posiadanie zainstalowanej biblioteki \lstinline|MPI|. Na pracowni WFiIS konieczne jest ponadto załadowanie odpowiednich zmiennych środowiskowych przed kompilacją za pomocą polecenia:
-\begin{lstlisting}
-$ source /opt/nfs/config/source_mpich32.sh
-\end{lstlisting}
-
-W dalszej części przydatny może się również okazać plik zawierający informację o dostępnych węzłach. Na pracowni generuje się go za pomocą poniższej komendy:
-\begin{lstlisting}
-$ /opt/nfs/config/station_name_list.sh 201 216 > nodes
 \end{lstlisting}
 
 \subsection{Uruchomienie} \label{sec:uru}
@@ -412,52 +514,6 @@ optional arguments:
 
 Grafy wygenerowane przy pomocy tego skryptu mogą zostać użyte jako dane wejściowe do programu.
 
-\subsection{Obsługa programu na pracowni}
-Z racji niedostępności programu \lstinline|CMake| na pracowni, zostały przygotowane dedykowane pliki \lstinline|Makefile| do obsługi programu. Plik przeznaczony do użycia przez użytkownika znajduje się w katalogu \lstinline|build_uni| wraz z odpowiednim plikiem do generacji dokumentacji.
-
-\subsubsection{Skrypt Makefile}
-
-Udostępnione zostały następujące opcje dla skryptu \lstinline|Makefile|:
-\begin{itemize}
-\item \lstinline|make install| - udostępnienie plików wykonywalnych w podkatalogu,
-\item \lstinline|make runMPI|  -  uruchomienie programu w wersji równoległej, opisane w punkcie \ref{sec:uru},
-\item \lstinline|make runSerial|  - uruchomienie programu w wersji sekwencyjnej, opisane w punkcie  \ref{sec:uru},
-\item \lstinline|make docs| - wygenerowanie dokumentacji \lstinline|Doxygen|, 
-\item \lstinline|make clean| - przywrócenie zawartości podkatalogu do stanu wyjściowego.
-\end{itemize}
-
-\subsubsection{Uruchomienie}
-Aby uruchomić program z przykładowymi argumentami należy wykonać następujące operacje (zakładając, że użytkownik znajduje się w katalogu głównym projektu):
-\begin{lstlisting}
-$ cd build_uni
-$ source /opt/nfs/config/source_mpich32.sh
-$ make runMPI
-\end{lstlisting}
-
-Szczególnie istotnym punktem jest załadowanie odpowiednich zmiennych środowiskowych.
-
-Uruchomienie programu bez użycia \lstinline|make runMPI| wygląda następująco:
-\begin{lstlisting}
-$ cd build_uni
-$ source /opt/nfs/config/source_mpich32.sh
-$ make installMPI
-$ mpiexec -n 5 DijkstraMPI 1 "../data/graph.dat"
-\end{lstlisting}
-
-W podobny sposób jak powyższe możemy uruchomić wersję sekwencyjną, oczywiście z odpowiednim kompilatorem.
-
-\subsubsection{Plik wejściowy z węzłami}
-
-Aby wygenerować plik wejściowy z węzłami, który może zostać użyty do uruchomienia wersji równoległej należy wykonać następujące polecenia:
-\begin{lstlisting}
-$ cd build_uni
-$ /opt/nfs/config/station_name_list.sh 201 216 > nodes
-\end{lstlisting}
-
-Tak wygenerowany plik można podać jako argument wykonania:
-\begin{lstlisting}
-$ make runMPI HOSTS="nodes"
-\end{lstlisting}
 
 \newpage
 \begin{thebibliography}{9}
