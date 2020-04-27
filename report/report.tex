@@ -124,7 +124,7 @@ Dijkstra(V, E, v)
 W czasie wykonania algorytmu program operuje na dwóch tablicach - jedna z nich, zwykle oznaczana literą \lstinline{d}, przechowuje koszty dotarcia z wierzchołka źródłowego do każdego z wierzchołków w badanym grafie. Druga, oznaczana literą \lstinline{p}, przechowuje informację o poprzedniku każdego z wierzchołków - taka informacja pozwala po zakończeniu działania algorytmu odtworzyć ścieżkę z wierzchołka źródłowego do każdego z wierzchołków w grafie.
 
 \subsection{Zastosowane technologie}
-Przygotowana aplikacja napisana została we języku C++ (w standardzie C++11). Do jej implementacji zastosowany został standard MPI (\textit{Message Passing Interface}), który stanowi protokół komunikacyjny pomiędzy równoległymi procesami. Odbywa się to za pomocą jawnie przekazywanych komunikatów. Możliwe są różne rodzaje komunikacji, na przykład typu punkt-punkt pomiędzy dwoma procesami (\lstinline|MPI_Send|, \lstinline|MPI_Recv|), albo komunikacja grupowa, gdzie bierze udział wiele procesów (na przykład \lstinline|MPI_Bcast|, \lstinline|MPI_Reduce|). Standard MPI jest wysocy wydajny i umożliwia efektywną obsługą dużej ilości procesów. W projekcie została użyta biblioteka \lstinline|MPICH| będąca implementacją standardu MPI. Pomocnicze skrypty napisane zostały w języku Python. System budowania oparty został na narzędziu CMake, jednak z uwagi na fakt, iż narzędzie to nie jest dostępne na komputerach pracowni wydziału, przygotowany został dodatkowy zestaw plików Makefile.
+Przygotowana aplikacja napisana została we języku C++ (w standardzie C++11). Do jej implementacji zastosowany został standard MPI (\textit{Message Passing Interface}), który stanowi protokół komunikacyjny pomiędzy równoległymi procesami. Wymiana informacji odbywa się za pomocą jawnie przekazywanych komunikatów. Możliwe są różne rodzaje komunikacji, na przykład typu punkt-punkt pomiędzy dwoma procesami (\lstinline|MPI_Send|, \lstinline|MPI_Recv|), albo komunikacja grupowa, gdzie bierze udział wiele procesów (na przykład \lstinline|MPI_Bcast|, \lstinline|MPI_Reduce|). Standard MPI jest wysocy wydajny i umożliwia efektywną obsługą dużej ilości procesów. W projekcie została użyta biblioteka \lstinline|MPICH| będąca implementacją standardu MPI. Pomocnicze skrypty napisane zostały w języku Python. System budowania oparty został na narzędziu CMake, jednak z uwagi na fakt, iż narzędzie to nie jest dostępne na komputerach pracowni wydziału, przygotowany został dodatkowy zestaw plików Makefile.
 
 
 
@@ -135,8 +135,8 @@ W tej części dokumentacji opisana została budowa przygotowanego projektu - za
 \subsection{Podział na komponenty}
 Projekt podzielony został na trzy główne komponenty:
 \begin{itemize}
-\item \lstinline{DijkstraCommon} - biblioteka statyczna zawierająca klasy oraz funkcje współdzielone przez pozostałe dwa komponenty. W jej skład wchodzą klasy odpowiedzialne za: zapis wyników obliczeń, walidację danych podanych przez użytkownika, przechowywanie danych na temat przetwarzanego grafu i jego poszczególnych wierzchołków czy przetwarzanie argumentów linii poleceń. Zawiera również klasę \lstinline{DijkstraAlgorithmBackend} stanowiącą szkielet implementowanego algorytmu.
-\item \lstinline{DijkstraSerial} - implementacja algorytmu bez użycia protokołu MPI, czyli w formie klasycznego algorytmu szeregowego. Komponent ten został dołączony do projektu jako punkt odniesienia w procesie testowania wydajności implementacji równoległej. Zawiera funkcję \lstinline{main}.
+\item \lstinline{DijkstraCommon} - biblioteka statyczna zawierająca klasy oraz funkcje współdzielone przez pozostałe dwa komponenty. W jej skład wchodzą klasy odpowiedzialne za: zapis wyników obliczeń, walidację danych podanych przez użytkownika, przechowywanie danych na temat przetwarzanego grafu i jego poszczególnych wierzchołków czy przetwarzanie argumentów linii poleceń. Zawiera również klasę \lstinline{DijkstraAlgorithmBackend} stanowiącą szkielet implementowanego algorytmu,
+\item \lstinline{DijkstraSerial} - implementacja algorytmu bez użycia protokołu MPI, czyli w formie klasycznego algorytmu szeregowego. Komponent ten został dołączony do projektu jako punkt odniesienia w procesie testowania wydajności implementacji równoległej. Zawiera funkcję \lstinline{main},
 \item \lstinline{DijkstraMPI} - implementacja algorytmu używająca protokołu MPI. Jest to jedyny komponent projektu używający tej biblioteki. Zawiera funkcję \lstinline{main}.
 \end{itemize}
 \begin{figure}[H]
@@ -152,10 +152,10 @@ Zależności między poszczególnymi komponentami przedstawia rysunek \ref{fig:a
 \subsection{Najważniejsze klasy w projekcie}
 Poniżej przedstawiono listę najważniejszych klas wchodzących w skład projektu (nie jest to pełna lista wszystkich klas, taką listę znaleźć można w dokumentacji wygenerowanej za pomocą narzędzia \lstinline{Doxygen}):
 \begin{itemize}
-\item klasa \lstinline{DijkstraAlgorithmBackend} z komponentu \lstinline{DijkstraCommon} - stanowi podstawę implementacji algorytmu zarówno w przypadku równoległym, jak i sekwencyjnym. Zarządza stanem wykonania algorytmu i wykonuje na tym stanie podstawowe operacje przewidziane przez algorytm, np. dodanie wierzchołka do zbioru wierzchołków przetworzonych czy wybór wierzchołka o najniższym koszcie. 
-\item klasa \lstinline{DijkstraMPI} z komponentu \lstinline{DijkstraMPI} - zawiera równoległą implementację algorytmu Dijkstry. Korzysta z API udostępnionego przez klasę \lstinline{DijkstraAlgorithmBackend}. Dostarcza pojedynczą metodę \lstinline{run} wykonującą algorytm i zwracającą jego wynik.
-\item klasa \lstinline{DijkstraSerial} z komponentu \lstinline{DijkstraSerial} - zawiera sekwencyjną implementację algorytmu Dijkstry. Korzysta z API udostępnionego przez klasę \lstinline{DijkstraAlgorithmBackend}. Dostarcza pojedynczą metodę \lstinline{run} wykonującą algorytm i zwracającą jego wynik.
-\item klasa \lstinline{AdjacencyMatrix} z komponentu \lstinline{DijkstraCommon} - pozwala na wczytanie i przechowywanie danych wejściowych
+\item klasa \lstinline{DijkstraAlgorithmBackend} z komponentu \lstinline{DijkstraCommon} - stanowi podstawę implementacji algorytmu zarówno w przypadku równoległym, jak i sekwencyjnym. Zarządza stanem wykonania algorytmu i wykonuje na tym stanie podstawowe operacje przewidziane przez algorytm, np. dodanie wierzchołka do zbioru wierzchołków przetworzonych czy wybór wierzchołka o najniższym koszcie,
+\item klasa \lstinline{DijkstraMPI} z komponentu \lstinline{DijkstraMPI} - zawiera równoległą implementację algorytmu Dijkstry. Korzysta z API udostępnionego przez klasę \lstinline{DijkstraAlgorithmBackend}. Dostarcza pojedynczą metodę \lstinline{run} wykonującą algorytm i zwracającą jego wynik,
+\item klasa \lstinline{DijkstraSerial} z komponentu \lstinline{DijkstraSerial} - zawiera sekwencyjną implementację algorytmu Dijkstry. Korzysta z API udostępnionego przez klasę \lstinline{DijkstraAlgorithmBackend}. Dostarcza pojedynczą metodę \lstinline{run} wykonującą algorytm i zwracającą jego wynik,
+\item klasa \lstinline{AdjacencyMatrix} z komponentu \lstinline{DijkstraCommon} - pozwala na wczytanie i przechowywanie danych wejściowych,
 \item klasa szablonowa \lstinline{Log} - udostępnia opcję wypisywania na standardowe wyjście informacji na temat działania algorytmu. Posiada specjalizację \lstinline{Log<false>}, które wyłącza mechanizm wypisywania informacji. Implementacja wypisywania oparta jest na tzw. \textit{variadic templates} z C++11. 
 \end{itemize}
 
@@ -173,7 +173,7 @@ W tej części dokumentacji omówiony zostanie sposób działania implementacji 
 Pierwsza część programu składa się z kilku mniejszych etapów. Na początku ma miejsce standardowa inicjalizacja protokołu MPI oraz przypisanie każdemu z procesów rangi. Kolejnym etapem jest utworzenie klasy odpowiedzialnej za wyświetlanie informacji o przebiegu programu na standardowe wyjście. W dalszej kolejności przetwarzane i walidowane są dane wejściowe - numer wierzchołka stanowiącego źródło oraz ścieżka do pliku z danymi wejściowymi. W przypadku, gdy dane są niepoprawne, program kończy działanie wyświetlając odpowiedni komunikat.
 
 \vspace{5mm}
-Następnie odbywa się przede wszystkim podział danych wejściowych na części i rozesłanie ich do poszczególnych procesów. Program przyjmuje informacje na temat przetwarzanego grafu w postaci tzw. \textbf{macierzy sąsiedztwa}. W i-tym rzędzie i j-tej kolumnie takiej macierzy znajduje się waga przypisana do krawędzi łączącej wierzchołek $i$ z wierzchołkiem $j$. W przypadku braku krawędzi waga wynosi 0. Rysunek \ref{fig:am1} przedstawia przykład tego typu reprezentacji wraz z odpowiadającym jej grafem.
+Następnie odbywa się podział danych wejściowych na części i rozesłanie ich do poszczególnych procesów. Program przyjmuje informacje na temat przetwarzanego grafu w postaci tzw. \textbf{macierzy sąsiedztwa}. W i-tym rzędzie i j-tej kolumnie takiej macierzy znajduje się waga przypisana do krawędzi łączącej wierzchołek $i$ z wierzchołkiem $j$. W przypadku braku krawędzi waga wynosi 0. Rysunek \ref{fig:am1} przedstawia przykład tego typu reprezentacji wraz z odpowiadającym jej grafem.
 
 \begin{figure}[H]
 \centering
@@ -207,8 +207,8 @@ Kolumny przypisywane są każdemu procesowi po kolei, tzn. proces 0 otrzymuje $x
 \newpage
 Po dokonaniu przez proces \lstinline{root} podziału, do każdego z procesów wysyłane są trzy informacje:
 \begin{itemize}
-\item całkowita liczba wierzchołków w przetwarzanym grafie - wysyłanie odbywa się za pomocą operacji kolektywnej \lstinline{MPI_Bcast}
-\item ilość kolumn macierzy sąsiedztwa, jaka każdy z procesów będzie musiał obsłużyć. Informacja ta jest w tym momencie potrzebna, ponieważ każdy z procesów musi przygotować sobie odpowiednio duży bufor na dane z samej macierzy. Wysyłanie tej informacji odbywa się za pomocą operacji \lstinline{MPI_Scatter}, ponieważ każdy z procesów otrzymuje swoją indywidualną informację.
+\item całkowita liczba wierzchołków w przetwarzanym grafie - wysyłanie odbywa się za pomocą operacji kolektywnej, \lstinline{MPI_Bcast}
+\item ilość kolumn macierzy sąsiedztwa, jaką każdy z procesów będzie musiał obsłużyć. Informacja ta jest w tym momencie potrzebna, ponieważ każdy z procesów musi przygotować sobie odpowiednio duży bufor na dane z samej macierzy. Wysyłanie tej informacji odbywa się za pomocą operacji \lstinline{MPI_Scatter}, ponieważ każdy z procesów otrzymuje swoją indywidualną informację,
 \item zawartość kolumn macierzy sąsiedztwa, które będą przetwarzane przez dany proces. Wysyłanie tej informacji odbywa się za pomocą funkcji \lstinline{MPI_Scatterv}, ponieważ jest ona w stanie obsłużyć wysyłanie innej ilości danych do każdego z procesów.
 \end{itemize}
 
@@ -240,24 +240,24 @@ Początek właściwej części programu stanowi sprawdzenie, czy danemu procesow
 \vspace{5mm}
 Implementacja algorytmu Dijkstry za pomocą protokołu MPI nie różni się w sposób znaczący od klasycznej implementacji szeregowej. Każdy z procesów obsługuje dwie tablice: 
 \begin{itemize}
-\item tablica odległości (kosztów) od wierzchołka źródłowego do każdego z wierzchołków w grafie
-\item tablica poprzedników każdego z wierzchołków - służy do odtworzenia najkrótszych ścieżek między wierzchołkami
+\item tablica odległości (kosztów) od wierzchołka źródłowego do każdego z wierzchołków w grafie,
+\item tablica poprzedników każdego z wierzchołków - służy do odtworzenia najkrótszych ścieżek między wierzchołkami,
 \end{itemize}
 oraz zbiór obsłużonych wierzchołków (często nazywany klastrem). Początkowo zbiór ten jest pusty, tablica kosztów zainicjalizowana jest nieskończonościami, a tablica poprzedników wartościami -1. Różnica w stosunku to szeregowej wersji algorytmu jest taka, że w przypadku implementacji równoległej każdy z procesów przechowuje \textbf{fragmenty tych tablic} odpowiadające przydzielonym im wierzchołkom grafu.
 
 \vspace{5mm}
 W procesie obsługującym wierzchołek źródłowy jego wpis w tablicy kosztów ustawiany jest na wartość 0. Następnie, dopóki wszystkie wierzchołki nie zostały przetworzone, wykonywany jest w pętli algorytm:
 \begin{itemize}
-\item każdy proces wybiera spośród przydzielonych mu wierzchołków taki, który nie został jeszcze dodany do zbioru wierzchołków obsłużonych i którego wartość w tablicy kosztów jest najmniejsza
-\item za pomocą operacji \lstinline{MPI_Allreduce} wybierany jest wierzchołek o globalnie najniższej wartości kosztu (czyli najlepszy spośród najlepszych z każdego procesu)
-\item jeśli nie został wyznaczony taki wierzchołek, to następuje wyjście z pętli i zakończenie algorytmu
-\item w przeciwnym razie wierzchołek zostaje dodany do zbioru wierzchołków przetworzonych (w każdym procesie zbiór ten jest przechowywany osobno, w całości)
-\item dla każdego nieprzetworzonego sąsiada wyznaczonego wierzchołka dokonywana jest aktualizacja w tablicy kosztów i poprzedników (wybrany wierzchołek staje się poprzednikiem swoich sąsiadów), jeśli nowy koszt okazuje się niższy od dotychczasowego
+\item każdy proces wybiera spośród przydzielonych mu wierzchołków taki, który nie został jeszcze dodany do zbioru wierzchołków obsłużonych i którego wartość w tablicy kosztów jest najmniejsza,
+\item za pomocą operacji \lstinline{MPI_Allreduce} wybierany jest wierzchołek o globalnie najniższej wartości kosztu (czyli najlepszy spośród najlepszych z każdego procesu),
+\item jeśli nie został wyznaczony taki wierzchołek, to następuje wyjście z pętli i zakończenie algorytmu,
+\item w przeciwnym razie wierzchołek zostaje dodany do zbioru wierzchołków przetworzonych (w każdym procesie zbiór ten jest przechowywany osobno, w całości),
+\item dla każdego nieprzetworzonego sąsiada wyznaczonego wierzchołka dokonywana jest aktualizacja w tablicy kosztów i poprzedników (wybrany wierzchołek staje się poprzednikiem swoich sąsiadów), jeśli nowy koszt okazuje się niższy od dotychczasowego.
 \end{itemize}
 Po zakończeniu działania algorytmu fragmenty tablic kosztów i poprzedników są łączone w całość za pomocą operacji \lstinline{MPI_Gatherv}. Proces \lstinline{root} wyznacza ścieżki z wierzchołka źródłowego do każdego wierzchołka w grafie i zapisuje wyniki do pliku. Następnie wyświetlany jest czas działania algorytmu. Ostatnim krokiem jest zwolnienie utworzonego wcześniej komunikatora, wywołanie operacji \lstinline{MPI_Finalize} i zakończenie działania programu.
 
 \vspace{5mm}
-W kilku miejscach w programie tworzona jest zmienna zawierająca aktualny czas. Pod koniec działania, proces \lstinline{root} zbiera te informacje i wyświetla czas wykonywania się każdej z trzech części programu:
+W kilku miejscach w programie tworzona jest zmienna zawierająca aktualny czas. Pod koniec działania proces \lstinline{root} zbiera te informacje i wyświetla czas wykonywania się każdej z trzech części programu:
 \begin{lstlisting}
 [Process 0] Total elapsed time: 0.0298846s
 [Process 0] Setup took: 0.0260188s
@@ -290,11 +290,11 @@ Rysunek \ref{fig:diagram3} przedstawia schemat blokowy ilustrujący działania g
 \subsection{Zastosowane funkcjonalności MPI}
 W ramach projektu zastosowane zostały następujące funkcjonalności MPI:
 \begin{itemize}
-\item operacja \lstinline{MPI_Bcast} - w celu rozesłania wszystkim procesom informacji o całkowitej ilości wierzchołków w przetwarzanym grafie
-\item operacja \lstinline{MPI_Scatter} - w celu wysłania każdemu z procesów liczby przypisanych mu do obsłużenia wierzchołków grafu
-\item operacja \lstinline{MPI_Scatterv} - celu wysłania każdemu z procesów danych z macierzy sąsiedztwa. Wymagana jest w tym przypadku możliwość wysłania każdemu z procesów danych o różnej długości.
-\item operacja \lstinline{MPI_Allreduce} - w celu wyznaczenia wierzchołka o najmniejszej wartości kosztu
-\item operacja \lstinline{MPI_Gatherv} - w celu zebrania wyników wyprodukowanych przez każdy z procesów. W tym przypadku wymagana jest możliwość odbioru od każdego z procesów danych i innej długości
+\item operacja \lstinline{MPI_Bcast} - w celu rozesłania wszystkim procesom informacji o całkowitej ilości wierzchołków w przetwarzanym grafie,
+\item operacja \lstinline{MPI_Scatter} - w celu wysłania każdemu z procesów liczby przypisanych mu do obsłużenia wierzchołków grafu,
+\item operacja \lstinline{MPI_Scatterv} - celu wysłania każdemu z procesów danych z macierzy sąsiedztwa. Wymagana jest w tym przypadku możliwość wysłania każdemu z procesów danych o różnej długości,
+\item operacja \lstinline{MPI_Allreduce} - w celu wyznaczenia wierzchołka o najmniejszej wartości kosztu,
+\item operacja \lstinline{MPI_Gatherv} - w celu zebrania wyników wyprodukowanych przez każdy z procesów. W tym przypadku wymagana jest możliwość odbioru od każdego z procesów danych i innej długości,
 \item operacje \lstinline{MPI_Comm_split} oraz \lstinline{MPI_Comm_free} - w celu utworzenia i zwolnienia nowego komunikatora. Pozwala to wykluczyć bierne (nadmiarowe) procesy z udziału w wykonywaniu algorytmu.
 \end{itemize}
 
@@ -335,10 +335,10 @@ Rysunek \ref{fig:testall} przedstawia wyniki uzyskane w badaniach czasu wykonani
 \label{fig:testall}
 \end{figure}
 
-Inaczej wygląda jednak sytuacja przedstawiona na rysunku \ref{fig:testall2}. Można zaobserwować, że dla dużej liczby wierzchołków (ponad 1000) aplikacja działająca sekwencyjnie oraz wariant MPI wykorzystujący tylko jeden proces znacznie tracą na wydajności. Dla 5000 wierzchołków zysk z użycia 16 i 64 procesów jest ponad dwukrotny. Należy jednak zauważyć, że dla takiego rozmiaru danych nie było opłacalne użycie aż 64 procesów - czas wykonania był taki sam jak w przypadku zaledwie 16.
+Inaczej jednak wygląda sytuacja przedstawiona na rysunku \ref{fig:testall2}. Można zaobserwować, że dla dużej liczby wierzchołków (ponad 1000) aplikacja działająca sekwencyjnie oraz wariant MPI wykorzystujący tylko jeden proces znacznie tracą na wydajności. Dla 5000 wierzchołków zysk z użycia 16 i 64 procesów jest ponad dwukrotny. Należy jednak zauważyć, że dla takiego rozmiaru danych nie było opłacalne użycie aż 64 procesów - czas wykonania był taki sam jak w przypadku zaledwie 16.
 
 \vspace{5mm}
-Rysunek \ref{fig:testag} przedstawia pomiary analogiczne do poprzednich, ale wykonane tylko dla części programu realizującej algorytm Dijkstry. Podobnie jak poprzednio, dla małej wielkości danych wejściowych użycie dużej liczby procesów jest nieopłacalne. Tym razem jednak zależność nie jest stała - jest to funkcja rosnąca, zgodnie z oczekiwaniami. Jest tak ponieważ na pomiar całości programu duży wpływ miała inicjalizacja, w tym czytanie danych z pliku. Podobnie jak wcześniej, również w tym przypadku dla dużych danych wejściowych (od około 1000 wierzchołków) zysk z użycia większej liczby procesów staje się widoczny. Wyniki uzyskane w tym teście są znacznie bardziej zróżnicowane niż poprzednio - pokazuje to, jak duży wpływ ma działanie programu miało czytanie pliku z danymi w pierwszym etapie wykonania. W tym wypadku widoczny staje się również zysk z użycia większej niż 16 liczby procesów.
+Rysunek \ref{fig:testag} przedstawia pomiary analogiczne do poprzednich, ale wykonane tylko dla części programu realizującej algorytm Dijkstry. Podobnie jak poprzednio, dla małej wielkości danych wejściowych użycie dużej liczby procesów jest nieopłacalne. Tym razem jednak zależność nie jest stała - jest to funkcja rosnąca, zgodnie z oczekiwaniami. Dzieje się tak, ponieważ na pomiar całości programu duży wpływ miała inicjalizacja, w tym czytanie danych z pliku. Podobnie jak wcześniej, również w tym przypadku dla dużych danych wejściowych (od około 1000 wierzchołków) zysk z użycia większej liczby procesów staje się widoczny. Wyniki uzyskane w tym teście są znacznie bardziej zróżnicowane niż poprzednio - pokazuje to, jak duży wpływ ma działanie programu miało czytanie pliku z danymi w pierwszym etapie wykonania. W tym wypadku widoczny staje się również zysk z użycia większej niż 16 liczby procesów.
 
 \vspace{5mm}
 Podsumowując, wykorzystując więcej niż jeden proces można uzyskać znaczną poprawę wydajności, pod warunkiem ze dane mają odpowiednio duży rozmiar.
@@ -377,8 +377,8 @@ Z racji niedostępności narzędzia \lstinline|CMake| na pracowni, zostały przy
 Udostępnione zostały następujące opcje dla skryptu \lstinline|Makefile|:
 \begin{itemize}
 \item \lstinline|make install| - udostępnienie plików wykonywalnych w podkatalogu,
-\item \lstinline|make runMPI|  -  uruchomienie programu w wersji równoległej, opisane w punkcie \ref{sec:uru},
-\item \lstinline|make runSerial|  - uruchomienie programu w wersji sekwencyjnej, opisane w punkcie  \ref{sec:uru},
+\item \lstinline|make runMPI|  -  uruchomienie programu w wersji równoległej, opisane dokładnie w punkcie \ref{sec:uru},
+\item \lstinline|make runSerial|  - uruchomienie programu w wersji sekwencyjnej, opisane dokładnie w punkcie  \ref{sec:uru},
 \item \lstinline|make docs| - wygenerowanie dokumentacji \lstinline|Doxygen|, 
 \item \lstinline|make clean| - przywrócenie zawartości podkatalogu do stanu wyjściowego.
 \end{itemize}
@@ -392,7 +392,10 @@ $ make runMPI
 \end{lstlisting}
 
 \noindent
-Szczególnie istotnym punktem jest załadowanie odpowiednich zmiennych środowiskowych. Uruchomienie programu bez użycia \lstinline|make runMPI| wygląda następująco:
+Szczególnie istotnym punktem jest załadowanie odpowiednich zmiennych środowiskowych za pomocą dedykowanego skryptu \lstinline|source_mpich32.sh|.
+\vspace{2cm}
+
+Uruchomienie programu bez użycia \lstinline|make runMPI| wygląda następująco:
 \begin{lstlisting}
 $ cd build_uni
 $ source /opt/nfs/config/source_mpich32.sh
@@ -412,7 +415,7 @@ $ /opt/nfs/config/station_name_list.sh 201 216 > nodes
 \end{lstlisting}
 
 \noindent
-Tak wygenerowany plik można podać jako argument wykonania:
+Tak wygenerowany plik można podać jako argument wykonania wersji równoległej programu:
 \begin{lstlisting}
 $ make runMPI HOSTS="nodes"
 \end{lstlisting}
@@ -440,8 +443,8 @@ Można skorzystać z domyślnych parametrów uruchomienia, lub podać własne:
 \begin{itemize}
 \item  \lstinline|VERTEX=V| - jako wierzchołek startowy zostanie wybrany wierzchołek \lstinline|V|, domyślną wartością jest $0$,
 \item  \lstinline|FILE=F| - jako plik wejściowy zostanie użyty plik \lstinline|F|, plik domyślny to \lstinline{../data/graph.dat}
-\item  \lstinline|N=N| - parametr \lstinline|mpiexec| ustalający ilość procesów, wartość domyślna jest równa $1$,
-\item  \lstinline|HOSTS=H| -  parametr \lstinline|mpiexec|, plik wejściowy z węzłami.
+\item  \lstinline|N=N| - parametr \lstinline|mpiexec| ustalający ilość procesów, wartość domyślna jest równa $1$, dostępny tylko dla wersji równoległej,
+\item  \lstinline|HOSTS=H| -  parametr \lstinline|mpiexec|, plik wejściowy z węzłami, dostępny tylko dla wersji równoległej.
 \end{itemize}
 
 \noindent
@@ -450,7 +453,7 @@ Przykładowe uruchomienie programu może wyglądać następująco:
 $ make runMPI VERTEX=1 FILE="../data/graph.dat" N=5
 \end{lstlisting}
 
-Jeśli użytkownik nie chce skorzystać z udostępnionych opcji można również uruchomić pliki wykonywalne samodzielnie. Po wykonaniu komendy \lstinline|make install-all| zostaną one udostępnione w katalogu z którego prowadzona była kompilacja. Jako argument należy podać kolejno numer wierzchołka startowego oraz plik wsadowy. Pierwszy argument jest obligatoryjny. Może to wyglądać np. tak jak poniżej:
+Jeśli użytkownik nie chce skorzystać z udostępnionych opcji można również uruchomić pliki wykonywalne samodzielnie. Po wykonaniu komendy \lstinline|make install-all| zostaną one udostępnione w katalogu z którego prowadzona była kompilacja. Jako argument należy podać kolejno numer wierzchołka startowego oraz plik wsadowy. Pierwszy argument jest obligatoryjny. Może to wyglądać na przykład tak jak poniżej:
 
 \begin{lstlisting}
 $ make install-all
@@ -467,7 +470,7 @@ Korzystając z udostępnionego \lstinline|CMakeLists.txt| można również włą
 \end{itemize}
 
 \noindent
-Dostępne są również dodatkowe opcje programu \lstinline|make|, takie jak:
+Dostępne są również opcje programu \lstinline|make|, takie jak:
 \begin{itemize}
 \item \lstinline| make clean-all | - przywrócenie zawartości podkatalogu do stanu wyjściowego,
 \item \lstinline| make install-all | - udostępnienie plików wykonywalnych w podkatalogu,
@@ -500,7 +503,7 @@ W ramach projektu został udostępniony dodatkowy skrypt  \lstinline|generateGra
 \item \lstinline|-f| - nazwa pliku wyjściowego, domyślna nazwa to \lstinline{graph.dat}.
 \end{itemize}
 
-Jeśli wartość krawędzi jest zbyt duża dla danej liczby wierzchołków, użytkownik zostaje poinformowany i zostaje ustawiona nowa, losowa wartość. Wagi krawędzi są nieujemnymi liczbami rzeczywistymi, z zakresu $[0, 10]$.
+Jeśli wartość krawędzi jest zbyt duża dla danej liczby wierzchołków, użytkownik zostaje o tym poinformowany i zostaje ustawiona nowa, losowa wartość. Wagi krawędzi są nieujemnymi liczbami rzeczywistymi, z zakresu $[0, 10]$.
 
 \begin{lstlisting}[caption={Pomoc skryptu \lstinline|generateGraphs.py|.}, captionpos=b ]
 generateGraphs.py [-h] [-e E] [-v V] [-f FILE]
