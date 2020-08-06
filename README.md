@@ -15,11 +15,11 @@ In out implementation, graph is stored using **adjacency matrix** representation
 
 If there is more processes than matrix columns, unnecessary processes do not take part in rest of the algorithm execution (separate MPI communicator it created). During the second step, we repeat following actions until all vertices had been processed:
 
- 1. Each process operates on vertices assigned to it and chooses one vertex with the smallest cost (based on values in an array). This vertex should not be processed yet.
+ 1. Each process operates on vertices assigned to it that have not been processed yet and chooses the one with the smallest cost (based on values in an array). 
 
 ![algo1](images/algo1.png "Algorithm step 1.")
 
- 2. Vertex with globally smallest cost is chosen (using reduction operation). Array of costs is updated.
+ 2. Vertex with globally smallest cost is chosen (using reduction operation) and marked as processed. Array of costs is updated.
 
 ![algo2](images/algo2.png "Algorithm step 2.")
 
